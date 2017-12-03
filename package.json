@@ -1,6 +1,6 @@
 {
   "name": "ssh2-promise",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Promise wrapper around SSH2 library",
   "main": "src/index.js",
   "repository": {
@@ -15,7 +15,14 @@
     "ssh2-promise",
     "ssh-promise",
     "sftp-promise",
-    "shell-promise"
+    "shell-promise",
+    "ssh promise",
+    "ssh tunnel",
+    "tunnel manager",
+    "ssh async await",
+    "tunnel async await",
+    "cache ssh",
+    "retry ssh"
   ],
   "author": "Sanket Bajoria",
   "license": "MIT",
