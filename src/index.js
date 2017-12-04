@@ -1,5 +1,6 @@
 const EventEmitter = require('events'),
     SSHConnection = require('./sshConnection'),
+    SFTP = require('./sftp');
     SSHConstants = require('./sshConstants'),
     SSHUtils = require('./sshUtils');
 
@@ -136,5 +137,9 @@ class SSH2Promise extends EventEmitter {
  * For caching SSH Connection
  */
 SSH2Promise.__cache = {};
+
+SSH2Promise.SSH = SSH2Promise;
+SSH2Promise.Utils = SSHUtils;
+SSH2Promise.SFTP = SFTP;
 
 module.exports = SSH2Promise;

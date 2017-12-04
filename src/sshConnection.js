@@ -62,7 +62,7 @@ class SSHConnection extends EventEmitter {
     sftp(createNew) {
         return this.connect().then(() => {
             if (createNew || !this.__sftp) {
-                this._sftp = new Promise((resolve, reject) => {
+                this.__sftp = new Promise((resolve, reject) => {
                     this.sshConnection.sftp((err, sftp) => {
                         if (err)
                             reject(err);

@@ -1,14 +1,15 @@
-# ssh2-promise
+# Description
 
-[ssh2-promise](https://github.com/sanketbajoria/ssh2-promise) is a promise wrapper around [ssh2](https://www.npmjs.com/package/ssh2) client. It supports all the ssh2 client operation such as connection hopping, exec, spawn, shell, sftp, open tunnel, open socks connection etc... in promisify way. It helps in caching the sshconnection, to reduce time, during connection hopping. It have reconnect logic, so that, once disconnected, it can retry the sshconnection, automatically.  
+[ssh2-promise](https://github.com/sanketbajoria/ssh2-promise) is a powerful promise wrapper around [ssh2](https://www.npmjs.com/package/ssh2) client. It supports all the ssh2 client operation such as connection hopping, exec, spawn, shell, sftp, open tunnel, open socks connection etc... in promisify way. It helps in caching the sshconnection, to reduce time, during connection hopping. It have reconnect logic, so that, once disconnected, it can retry the sshconnection, automatically.  
+It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too.
 
-## Installation
+# Installation
 
 ```javascript
 npm install ssh2-promise;
 ```
 
-## Usage
+# Usage
 All examples are shown in promisify and async-await manner.
 
 #### Require
@@ -124,7 +125,7 @@ ssh.spawn("tail -f /var/log.txt").then((socket) => {
 var ssh = new SSH2Promise(sshconfig);
 
 //Promise
-//Get a sftp session
+//Get a raw sftp session
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 ssh.sftp().then((sftp) => {
   sftp.readdir("/", (err, data) => {
@@ -143,7 +144,7 @@ ssh.shell().then((socket) => {
 
 
 //Async Await
-//Get a sftp session
+//Get a raw sftp session
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 (async function(){
     var sftp = await ssh.sftp();
@@ -160,6 +161,38 @@ ssh.shell().then((socket) => {
     })
     //Can write to socket 
     socket.write("")
+})();
+```
+
+#### sftp operation
+
+```javascript
+var ssh = new SSH2Promise(sshconfig);
+var sftp = new SSH2Promise.SFTP(ssh);
+
+//We can do all sftp client operation listed in "https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md" in promisify or async await manner.
+
+//Promise
+//Read dir
+sftp.readdir("/").then((list) => {
+  console.log(list); //list of files in directory '/'
+});
+//Create ReadStream
+sftp.createReadStream("/test.sh").then((stream) => {
+  console.log(stream); //Readable stream, which support data, close events etc.. 
+});
+
+
+//Async Await
+//Read dir
+(async function(){
+    var list = await sftp.readdir("/");
+    console.log(list); //list of files in directory '/'
+})();
+//Create ReadStream
+(async function(){
+    var stream = await sftp.createReadStream("/test.sh");
+    console.log(stream); //Readable stream, which support data, close events etc.. 
 })();
 ```
 
@@ -197,7 +230,12 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 ```
 
 
-## API
+# API
+`require('ssh2-promise')` or `require('ssh2-promise').SSH2` returns a **SSH2** constructor.
+
+`require('ssh2-promise').SFTP` returns a **SFTP** constructor.
+
+## SSH2
 
 #### Events
 * **ssh**(< _string_ >status, < _object_ >sshconnection, < _object_ >payload) - Event get generated, when sshconnection status get changed. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
@@ -301,8 +339,13 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
 * **getSocksPort**() - Start a socks server. And, return a socks port, for reverse tunneling purpose.
 
+## SFTP
+It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md).
 
-## LICENSE
+#### Methods
+* **(constructor)**(< _object_ > ssh2) - Creates and returns a new SFTP instance, which can perform all sftp client operation such readdir, mkdir etc... in promisify way.
+
+# LICENSE
 
 MIT
 
