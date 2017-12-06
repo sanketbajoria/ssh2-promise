@@ -1,7 +1,7 @@
 # Description
 
 [ssh2-promise](https://github.com/sanketbajoria/ssh2-promise) is a powerful promise wrapper around [ssh2](https://www.npmjs.com/package/ssh2) client. It supports all the ssh2 client operation such as connection hopping, exec, spawn, shell, sftp, open tunnel, open socks connection etc... in promisify way. It helps in caching the sshconnection, to reduce time, during connection hopping. It have reconnect logic, so that, once disconnected, it can retry the sshconnection, automatically.  
-It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too.
+It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too. It can handle 'continue' event automatically, While doing any sftp operation.
 
 # Installation
 
@@ -125,7 +125,7 @@ ssh.spawn("tail -f /var/log.txt").then((socket) => {
 var ssh = new SSH2Promise(sshconfig);
 
 //Promise
-//Get a raw sftp session
+//Get a raw sftp session, please don't use raw sftp session, instead use SFTP Promise wrapper defined below example.
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 ssh.sftp().then((sftp) => {
   sftp.readdir("/", (err, data) => {
@@ -144,7 +144,7 @@ ssh.shell().then((socket) => {
 
 
 //Async Await
-//Get a raw sftp session
+//Get a raw sftp session, please don't use raw sftp session, instead use SFTP Promise wrapper defined below example.
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 (async function(){
     var sftp = await ssh.sftp();
@@ -164,7 +164,7 @@ ssh.shell().then((socket) => {
 })();
 ```
 
-#### sftp operation
+#### sftp operation in promise & async await manner
 
 ```javascript
 var ssh = new SSH2Promise(sshconfig);

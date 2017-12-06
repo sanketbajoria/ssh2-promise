@@ -7,6 +7,7 @@ module.exports = {
         BEFORECONNECT: "beforeconnect",
         CONNECT: "connect",
         BEFOREDISCONNECT: "beforedisconnect",
-        DISCONNECT: "disconnect"
+        DISCONNECT: "disconnect",
+        CONTINUE: "continue"
     }
 }

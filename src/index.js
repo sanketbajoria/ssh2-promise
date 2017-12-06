@@ -4,10 +4,17 @@ const EventEmitter = require('events'),
     SSHConstants = require('./sshConstants'),
     SSHUtils = require('./sshUtils');
 
-function register(sshConnection, sshTunnel) {
+function isRegistered(sshConnection, sshTunnel){
+    return sshTunnel.deregister.filter((i) => {
+        return i.sshConnection.config.uniqueId === sshConnection.config.uniqueId;
+    }).length>0;
+}    
+
+function register(sshConnection, sshTunnel, isLast) {
     var events = [SSHConstants.CHANNEL.SSH, SSHConstants.CHANNEL.TUNNEL];
     sshConnection.__sshTunnels = sshConnection.__sshTunnels || [];
     sshConnection.__sshTunnels.push(sshTunnel);
+    
     var cbs = events.map((event) => {
         var cb = (function () {
             this.emit.apply(this, arguments);
@@ -15,18 +22,35 @@ function register(sshConnection, sshTunnel) {
         sshConnection.on(event, cb);
         return cb;    
     });
-    sshConnection.on(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`, () => {
+    
+    
+    var disconnectEvent = `${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`;
+    var disconnectCb = () => {
         var del;
         for(var i=0; i<sshTunnel.config.length; i++){
-            if(sshTunnel.config[i].uniqueId === sshConnection.uniqueId){
+            if(sshTunnel.config[i].uniqueId === sshConnection.config.uniqueId){
                 del = true;
             }
-            if(del){
+            if(del && SSH2Promise.__cache[sshTunnel.config[i].uniqueId]){
                 SSH2Promise.__cache[sshTunnel.config[i].uniqueId].close();
                 delete SSH2Promise.__cache[sshTunnel.config[i].uniqueId];
             }
         }
-    });
+    };
+    events.push(disconnectEvent);
+    cbs.push(disconnectCb);
+    sshConnection.on(disconnectEvent, disconnectCb);
+    
+    if(isLast){
+        var continueEvent = `${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`;
+        var continueCb = () => {
+            sshTunnel.emit.apply(sshTunnel, arguments);
+        };
+        events.push(continueEvent);
+        cbs.push(continueCb);
+        sshConnection.on(continueEvent, continueCb);
+    }
+
     return {
         sshConnection: sshConnection,
         events: events,
@@ -84,7 +108,7 @@ class SSH2Promise extends EventEmitter {
      * Get SSH if existing from cache otherwise create new one
      * @param {*} sshConfig 
      */
-    getSSHConnection(sshConfig) {
+    getSSHConnection(sshConfig, isLast) {
         var ret;
         if (this.disableCache) {
             ret = new SSHConnection(sshConfig);
@@ -94,7 +118,9 @@ class SSH2Promise extends EventEmitter {
             }
             ret = SSH2Promise.__cache[sshConfig.uniqueId];
         }
-        this.deregister.push(register(ret, this));
+        if(!isRegistered(ret, this)){
+            this.deregister.push(register(ret, this, isLast));
+        }
         return ret.connect().then((ssh) => {
             ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
             return ssh;
@@ -108,9 +134,9 @@ class SSH2Promise extends EventEmitter {
     connect() {
         var lastSSH;
         for (var i = 0; i < this.config.length; i++) {
-            ((sshConfig) => {
+            ((sshConfig, isLast) => {
                 if (!lastSSH) {
-                    lastSSH = this.getSSHConnection(sshConfig);
+                    lastSSH = this.getSSHConnection(sshConfig, isLast);
                 } else {
                     lastSSH = lastSSH.then((ssh) => {
                         return ssh.spawnCmd(`nc ${sshConfig.host} ${sshConfig.port}`);
@@ -119,7 +145,7 @@ class SSH2Promise extends EventEmitter {
                         return this.getSSHConnection(sshConfig);
                     });
                 }
-            })(this.config[i]);
+            })(this.config[i], i == this.config.length-1);
         }
         return lastSSH;
     }

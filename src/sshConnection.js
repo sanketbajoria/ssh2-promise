@@ -197,6 +197,8 @@ class SSHConnection extends EventEmitter {
                 this.__err = err;
                 reject(err);
                 this.__$connectPromise = null;
+            }).on('continue', () => {
+               this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE); 
             }).on('close', (hadError) => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: this.__err});
                 reject(this.__err);
