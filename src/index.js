@@ -139,7 +139,7 @@ class SSH2Promise extends EventEmitter {
                     lastSSH = this.getSSHConnection(sshConfig, isLast);
                 } else {
                     lastSSH = lastSSH.then((ssh) => {
-                        return ssh.spawnCmd(`nc ${sshConfig.host} ${sshConfig.port}`);
+                        return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);
                     }).then((stream) => {
                         sshConfig.sock = stream;
                         return this.getSSHConnection(sshConfig);
