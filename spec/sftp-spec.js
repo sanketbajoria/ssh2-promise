@@ -29,9 +29,10 @@ describe("sftp cmd", function () {
   it("write stream", function (done) {
     sftp.createWriteStream("/home/ubuntu/abc").then((stream) => {
         expect(stream).toBeDefined();
-        stream.write('dummy\n\n\nasdfjsdaf\n');
-        stream.close();
-        done();
+        stream.write('dummy\n\n\nasdfjsdaf\n', () => {
+            stream.end();
+            done();
+        });
     }, (error) => {
         expect(error).toBeUndefined();
         done();
@@ -39,13 +40,14 @@ describe("sftp cmd", function () {
   });
   
   it("read stream", function (done) {
-    sftp.createReadStream("/home/ubuntu/dummy").then((stream) => {
-        //console.log(stream);
+    sftp.createReadStream("/home/ubuntu/abc").then((stream) => {
         expect(stream).toBeDefined();
         var buffer = "";
         stream.on('data', (data) => {
-            console.log("asdffs" + data);
             buffer += data.toString();
+        });
+        stream.on('error', (err) => {
+            console.log(err);
         });
         stream.on('close', () => {
             console.log(buffer);
