@@ -5,20 +5,18 @@ Promise.prototype.finally = function(cb) {
     const fin = () => Promise.resolve(cb()).then(res);
     return this.then(fin, fin);
 };
+var fs = require("fs");
+var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+
 describe("exec n spawn cmd", function () {
   var sshTunnel;
   beforeAll(() => {
-    var sshConfig = {
-        username: "demo",
-        host: "test.rebex.net",
-        password: "password"
-    }
-    sshTunnel = new SSHTunnel(sshConfig);
+    sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
   })
   
   it("exec a command", function (done) {
     sshTunnel.exec("whoami").then((username) => {
-        expect(username.trim()).toEqual("Relay-DEV-Tunnel-Service");
+        expect(username.trim()).toEqual("ubuntu");
     }, (error) => {
         expect(error).toBeUndefined();
     }).finally(() => {
@@ -29,6 +27,7 @@ describe("exec n spawn cmd", function () {
   it("open sftp session", function (done) {
     sshTunnel.sftp().then((sftp) => {
         expect(sftp).toBeDefined();
+        expect(sftp.readdir).toBeDefined();
     }, (error) => {
         expect(error).toBeUndefined();
     }).finally(() => {
@@ -57,7 +56,7 @@ describe("exec n spawn cmd", function () {
   });
 
   it("open forward tunnel connection", function (done) {
-    sshTunnel.addTunnel({remoteAddr: "couchdbnew.relayhub.pitneycloud.com", remotePort: "80"}).then((tunnel) => {
+    sshTunnel.addTunnel({remoteAddr: "www.google.com", remotePort: "443"}).then((tunnel) => {
         expect(tunnel.localPort).toBeDefined();
     }, (error) => {
         expect(error).toBeUndefined();
@@ -70,9 +69,6 @@ describe("exec n spawn cmd", function () {
   afterAll(() => {
       sshTunnel.close()
   })
-
-  
-  
 
 
 });   

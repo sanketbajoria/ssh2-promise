@@ -61,8 +61,9 @@ function register(sshConnection, sshTunnel, isLast) {
                 events.forEach((event, idx) => {
                     sshConnection.removeListener(event, cbs[idx]);
                 });
+                Promise.resolve();
             }else{
-                sshConnection.close().then(() => {
+                return sshConnection.close().then(() => {
                     events.forEach((event, idx) => {
                         sshConnection.removeListener(event, cbs[idx]);
                     });
@@ -74,12 +75,20 @@ function register(sshConnection, sshTunnel, isLast) {
 
 var methods = ['exec', 'spawn', 'sftp', 'shell', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel']
 
+var defaultOptions = {
+    reconnect: true,
+    port: 22,
+    reconnectTries: 10,
+    reconnectDelay: 5000
+};
+
 class SSH2Promise extends EventEmitter {
 
     constructor(options, disableCache) {
         super();
         options = Array.isArray(options) ? options : [options];
         this.config = options.map(o => {
+            o = Object.assign({}, defaultOptions, o);
             o.uniqueId = o.uniqueId || `${o.username}@${o.host}`;
             return o;
         });
@@ -142,7 +151,7 @@ class SSH2Promise extends EventEmitter {
                         return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);
                     }).then((stream) => {
                         sshConfig.sock = stream;
-                        return this.getSSHConnection(sshConfig);
+                        return this.getSSHConnection(sshConfig, isLast);
                     });
                 }
             })(this.config[i], i == this.config.length-1);
@@ -154,7 +163,7 @@ class SSH2Promise extends EventEmitter {
      * Close SSH Connection
      */
     close() {
-        this.deregister.forEach(f => f.close());
+        return Promise.all(this.deregister.map(f => f.close()));
     }
 
 }
@@ -167,5 +176,6 @@ SSH2Promise.__cache = {};
 SSH2Promise.SSH = SSH2Promise;
 SSH2Promise.Utils = SSHUtils;
 SSH2Promise.SFTP = SFTP;
+SSH2Promise.Constants = SSHConstants;
 
 module.exports = SSH2Promise;

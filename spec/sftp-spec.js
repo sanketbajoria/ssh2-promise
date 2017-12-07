@@ -5,15 +5,14 @@ Promise.prototype.finally = function(cb) {
     const fin = () => Promise.resolve(cb()).then(res);
     return this.then(fin, fin);
 };
+var fs = require("fs");
+var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+
+
 describe("sftp cmd", function () {
   var sshTunnel;
   beforeAll(() => {
-    var sshConfig = {
-        username: "demo",
-        host: "test.rebex.net",
-        password: "password"
-    }
-    sshTunnel = new SSHTunnel(sshConfig);
+    sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
     sftp = new SSHTunnel.SFTP(sshTunnel);
   })
   
@@ -27,29 +26,31 @@ describe("sftp cmd", function () {
     });
   }); 
 
-  
-  it("read stream", function (done) {
-    sftp.createReadStream("/home/Relay-DEV-Tunnel-Service/temp/test.sh").then((stream) => {
+  it("write stream", function (done) {
+    sftp.createWriteStream("/home/ubuntu/abc").then((stream) => {
         expect(stream).toBeDefined();
-        var buffer = "";
-        stream.on('data', (data) => {
-            buffer += data;
-        });
-        stream.on('close', () => {
-            console.log(buffer);
-            done();
-        })
+        stream.write('dummy\n\n\nasdfjsdaf\n');
+        stream.close();
+        done();
     }, (error) => {
         expect(error).toBeUndefined();
         done();
     })
   });
-
-  it("write stream", function (done) {
-    sftp.createWriteStream("/home/Relay-DEV-Tunnel-Service/temp/abc").then((stream) => {
+  
+  it("read stream", function (done) {
+    sftp.createReadStream("/home/ubuntu/dummy").then((stream) => {
+        //console.log(stream);
         expect(stream).toBeDefined();
-        stream.end('dummy');
-        done();
+        var buffer = "";
+        stream.on('data', (data) => {
+            console.log("asdffs" + data);
+            buffer += data.toString();
+        });
+        stream.on('close', () => {
+            console.log(buffer);
+            done();
+        })
     }, (error) => {
         expect(error).toBeUndefined();
         done();

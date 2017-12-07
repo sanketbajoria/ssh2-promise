@@ -1,6 +1,6 @@
 {
   "name": "ssh2-promise",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Promise wrapper around SSH2 library",
   "main": "src/index.js",
   "repository": {
@@ -33,6 +33,7 @@
     "ssh2": "^0.5.5"
   },
   "devDependencies": {
-    "jasmine": "^2.8.0"
+    "jasmine": "^2.8.0",
+    "mock-stdin": "^0.3.1"
   }
 }
