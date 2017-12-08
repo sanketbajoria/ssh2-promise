@@ -295,11 +295,11 @@ ssh.subsys('sftp').then((stream) => {
 #### Events
 * **ssh**(< _string_ >status, < _object_ >sshconnection, < _object_ >payload) - Event get generated, when sshconnection status get changed. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
 
-* **ssh:<status>**(< _object_ >sshconnection, < _object_ >payload) - Event get generated, when sshconnection status at particular status. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
+* **ssh:< _status_ >**(< _object_ >sshconnection, < _object_ >payload) - Event get generated, when sshconnection status is at particular status. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
 
 * **tunnel**(< _string_ >status, < _object_ >sshconnection, < _object_ >payload) - Event get generated, when tunnel status get changed. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
 
-* **tunnel:<status>**(< _object_ >sshconnection, < _object_ >payload) - Event get generated, when tunnel status at particular status. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
+* **tunnel:< _status_ >**(< _object_ >sshconnection, < _object_ >payload) - Event get generated, when tunnel status is at particular status. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
 
 #### Methods
 * **(constructor)**(< _array_ >|< _object_ >sshConfig, < _(Promise)_ >disableCache) - Creates and returns a new SSH2Promise instance. Single or multiple sshconfigs can be passed. sshConfig passed to SSH2Promise is aligned to [ssh2](https://www.npmjs.com/package/ssh2) library. It has few extra options other than ssh2 configuration. 
@@ -458,63 +458,63 @@ It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SF
 
     If 'autoClose' is set to false and you pipe to this stream, this stream will not automatically close after there is no more data upstream -- allowing future pipes and/or manual writes.
 
-* **open**(< _string_ >filename, < _string_ >flags, [< _mixed_ >attrs_mode]) - _(Promise)_ - Opens a file `filename` with `flags` with optional _ATTRS_ object or file mode `attrs_mode`. `flags` is any of the flags supported by `fs.open` (except sync flag). if promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
+* **open**(< _string_ >filename, < _string_ >flags, [< _mixed_ >attrs_mode]) - _(Promise)_ - Opens a file `filename` with `flags` with optional _ATTRS_ object or file mode `attrs_mode`. `flags` is any of the flags supported by `fs.open` (except sync flag). If promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
 
-* **close**(< _Buffer_ >handle) - _(Promise)_ - Closes the resource associated with `handle` given by open() or opendir(). if promise got rejected, then return < _Error_ >err.
+* **close**(< _Buffer_ >handle) - _(Promise)_ - Closes the resource associated with `handle` given by open() or opendir(). If promise is rejected, then return < _Error_ >err.
 
-* **readFile**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. if promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
+* **readFile**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. If promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
 
-* **writeFile**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. if promise got rejected, then return < _Error_ >err.
+* **writeFile**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. If promise is rejected, then return < _Error_ >err.
 
-* **getStat**(< _string_ >filename) - _(Promise)_ - Retrieves attributes for the resource associated with `file`. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+* **getStat**(< _string_ >filename) - _(Promise)_ - Retrieves attributes for the resource associated with `file`. If promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
 
-* **setStat**(< _string_ >filename, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for the resource associated with `file`. if promise got rejected, then return < _Error_ >err.
+* **setStat**(< _string_ >filename, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for the resource associated with `file`. If promise is rejected, then return < _Error_ >err.
 
-* **changeTimestamp**(< _string_ >filename, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for the resource associated with `file`. `atime` and `mtime` can be Date instances or UNIX timestamps. if promise got rejected, then return < _Error_ >err.
+* **changeTimestamp**(< _string_ >filename, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for the resource associated with `file`. `atime` and `mtime` can be Date instances or UNIX timestamps. If promise is rejected, then return < _Error_ >err.
 
-* **changeOwner**(< _string_ >filename, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for the resource associated with `file`. if promise got rejected, then return < _Error_ >err.
+* **changeOwner**(< _string_ >filename, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for the resource associated with `file`. If promise is rejected, then return < _Error_ >err.
 
-* **changeMode**(< _string_ >filename, < _mixed_ >mode) - _(Promise)_ - Sets the mode for the resource associated with `file`. `mode` can be an integer or a string containing an octal number. if promise got rejected, then return < _Error_ >err.
+* **changeMode**(< _string_ >filename, < _mixed_ >mode) - _(Promise)_ - Sets the mode for the resource associated with `file`. `mode` can be an integer or a string containing an octal number. If promise is rejected, then return < _Error_ >err.
 
-* **opendir**(< _string_ >path) - _(Promise)_ - Opens a directory `path`. if promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
+* **opendir**(< _string_ >path) - _(Promise)_ - Opens a directory `path`. If promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
 
-* **readdir**(< _mixed_ >location) - _(Promise)_ - Retrieves a directory listing. `location` can either be a _Buffer_ containing a valid directory handle from opendir() or a _string_ containing the path to a directory. if promise resolved successfully, then return < _mixed_ >list, otherwise < _Error_ >err. `list` is an _Array_ of `{ filename: 'foo', longname: '....', attrs: {...} }` style objects (attrs is of type _ATTR_). If `location` is a directory handle, this function may need to be called multiple times until `list` is boolean false, which indicates that no more directory entries are available for that directory handle.
+* **readdir**(< _mixed_ >location) - _(Promise)_ - Retrieves a directory listing. `location` can either be a _Buffer_ containing a valid directory handle from opendir() or a _string_ containing the path to a directory. If promise resolved successfully, then return < _mixed_ >list, otherwise < _Error_ >err. `list` is an _Array_ of `{ filename: 'foo', longname: '....', attrs: {...} }` style objects (attrs is of type _ATTR_). If `location` is a directory handle, this function may need to be called multiple times until `list` is boolean false, which indicates that no more directory entries are available for that directory handle.
 
-* **unlink**(< _string_ >path) - _(Promise)_ - Removes the file/symlink at `path`. if promise got rejected, then return < _Error_ >err.
+* **unlink**(< _string_ >path) - _(Promise)_ - Removes the file/symlink at `path`. If promise is rejected, then return < _Error_ >err.
 
-* **rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - Renames/moves `srcPath` to `destPath`. if promise got rejected, then return < _Error_ >err.
+* **rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - Renames/moves `srcPath` to `destPath`. If promise is rejected, then return < _Error_ >err.
 
-* **mkdir**(< _string_ >path, [< _ATTRS_ >attributes, ]) - _(Promise)_ - Creates a new directory `path`. if promise got rejected, then return < _Error_ >err.
+* **mkdir**(< _string_ >path, [< _ATTRS_ >attributes, ]) - _(Promise)_ - Creates a new directory `path`. If promise is rejected, then return < _Error_ >err.
 
-* **rmdir**(< _string_ >path) - _(Promise)_ - Removes the directory at `path`. if promise got rejected, then return < _Error_ >err.
+* **rmdir**(< _string_ >path) - _(Promise)_ - Removes the directory at `path`. If promise is rejected, then return < _Error_ >err.
 
-* **stat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+* **stat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. If promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
 
-* **lstat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. If `path` is a symlink, the link itself is stat'ed instead of the resource it refers to. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+* **lstat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. If `path` is a symlink, the link itself is stat'ed instead of the resource it refers to. If promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
 
-* **setstat**(< _string_ >path, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for `path`. if promise got rejected, then return < _Error_ >err.
+* **setstat**(< _string_ >path, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for `path`. If promise is rejected, then return < _Error_ >err.
 
-* **utimes**(< _string_ >path, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for `path`. `atime` and `mtime` can be Date instances or UNIX timestamps. if promise got rejected, then return < _Error_ >err.
+* **utimes**(< _string_ >path, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for `path`. `atime` and `mtime` can be Date instances or UNIX timestamps. If promise is rejected, then return < _Error_ >err.
 
-* **chown**(< _string_ >path, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for `path`. if promise got rejected, then return < _Error_ >err.
+* **chown**(< _string_ >path, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for `path`. If promise is rejected, then return < _Error_ >err.
 
-* **chmod**(< _string_ >path, < _mixed_ >mode) - _(Promise)_ - Sets the mode for `path`. `mode` can be an integer or a string containing an octal number. if promise got rejected, then return < _Error_ >err.
+* **chmod**(< _string_ >path, < _mixed_ >mode) - _(Promise)_ - Sets the mode for `path`. `mode` can be an integer or a string containing an octal number. If promise is rejected, then return < _Error_ >err.
 
-* **readlink**(< _string_ >path) - _(Promise)_ - Retrieves the target for a symlink at `path`. if promise resolved successfully, then return < _string_ >target, otherwise < _Error_ >err.
+* **readlink**(< _string_ >path) - _(Promise)_ - Retrieves the target for a symlink at `path`. If promise resolved successfully, then return < _string_ >target, otherwise < _Error_ >err.
 
-* **symlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - Creates a symlink at `linkPath` to `targetPath`. if promise got rejected, then return < _Error_ >err.
+* **symlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - Creates a symlink at `linkPath` to `targetPath`. If promise is rejected, then return < _Error_ >err.
 
-* **realpath**(< _string_ >path) - _(Promise)_ - Resolves `path` to an absolute path. if promise resolved successfully, then return < _string_ >absPath, otherwise < _Error_ >err.
+* **realpath**(< _string_ >path) - _(Promise)_ - Resolves `path` to an absolute path. If promise resolved successfully, then return < _string_ >absPath, otherwise < _Error_ >err.
 
-* **ext_openssh_rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX rename(3) from `srcPath` to `destPath`. if promise got rejected, then return < _Error_ >err.
+* **ext_openssh_rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX rename(3) from `srcPath` to `destPath`. If promise is rejected, then return < _Error_ >err.
 
-* **ext_openssh_statvfs**(< _string_ >path) - _(Promise)_ - **OpenSSH extension** Performs POSIX statvfs(2) on `path`. if promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
+* **ext_openssh_statvfs**(< _string_ >path) - _(Promise)_ - **OpenSSH extension** Performs POSIX statvfs(2) on `path`. If promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
 
-* **ext_openssh_fstatvfs**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fstatvfs(2) on open handle `handle`. if promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
+* **ext_openssh_fstatvfs**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fstatvfs(2) on open handle `handle`. If promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
 
-* **ext_openssh_hardlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX link(2) to create a hard link to `targetPath` at `linkPath`. if promise got rejected, then return < _Error_ >err.
+* **ext_openssh_hardlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX link(2) to create a hard link to `targetPath` at `linkPath`. If promise is rejected, then return < _Error_ >err.
 
-* **ext_openssh_fsync**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fsync(3) on the open handle `handle`. if promise got rejected, then return < _Error_ >err.
+* **ext_openssh_fsync**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fsync(3) on the open handle `handle`. If promise is rejected, then return < _Error_ >err.
 
 #### ATTRS
 
