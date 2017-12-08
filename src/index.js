@@ -73,7 +73,7 @@ function register(sshConnection, sshTunnel, isLast) {
     }
 }
 
-var methods = ['exec', 'spawn', 'sftp', 'shell', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel']
+var methods = ['exec', 'spawn', 'sftp', 'shell', 'subsys', 'x11', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel']
 
 var defaultOptions = {
     reconnect: true,

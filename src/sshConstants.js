@@ -1,7 +1,8 @@
 module.exports = {
     "CHANNEL": {
         SSH: "ssh",
-        TUNNEL: "tunnel"
+        TUNNEL: "tunnel",
+        X11: "x11"
     },
     "STATUS": {
         BEFORECONNECT: "beforeconnect",

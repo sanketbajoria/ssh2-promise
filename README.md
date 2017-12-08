@@ -181,6 +181,10 @@ sftp.readdir("/").then((list) => {
 sftp.createReadStream("/test.sh").then((stream) => {
   console.log(stream); //Readable stream, which support data, close events etc.. 
 });
+//Get stat
+sftp.getStat("/test.sh").then((stat) => {
+  console.log(stat); //Stat object 
+});
 
 
 //Async Await
@@ -193,6 +197,11 @@ sftp.createReadStream("/test.sh").then((stream) => {
 (async function(){
     var stream = await sftp.createReadStream("/test.sh");
     console.log(stream); //Readable stream, which support data, close events etc.. 
+})();
+//Get stat
+(async function(){
+    var st = await sftp.getStat("/test.sh");
+    console.log(stat); //Stat object 
 })();
 ```
 
@@ -229,6 +238,52 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 })();
 ```
 
+#### x11
+
+```javascript
+var ssh = new SSH2Promise(sshconfig);
+
+//It will establish the x11 forwarding, if
+//x server running locally, 
+//x forwarding enabled on remote server 
+//xeyes command is installed on remote server
+
+//Promise
+ssh.x11('xeyes').then(() => {
+  console.log("success"); //if x server running locally, (x forwarding enabled & xeyes command is installed) on remote server
+}, () => {
+  console.log("error"); //if any success condition is not met
+});
+
+//Async Await
+(async function(){
+  try{
+    await ssh.x11('xeyes');
+    console.log("success"); //if x server running locally, (x forwarding enabled & xeyes command is installed) on remote server
+  }catch(err){
+    console.log("error"); //if any success condition is not met
+  }
+})();
+```
+
+#### subsys
+
+```javascript
+var ssh = new SSH2Promise(sshconfig);
+
+//It will start subsystem
+
+//Promise
+ssh.subsys('sftp').then((stream) => {
+  console.log("success"); //sftp system started successfully
+});
+
+//Async Await
+(async function(){
+  var stream = await ssh.subsys('sftp');
+  console.log("success"); //sftp system started successfully
+})();
+```
 
 # API
 `require('ssh2-promise')` or `require('ssh2-promise').SSH2` returns a **SSH2** constructor.
@@ -247,14 +302,14 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 * **tunnel:<status>**(< _object_ >sshconnection, < _object_ >payload) - Event get generated, when tunnel status at particular status. Various status can be "beforeconnect", "connect", "beforedisconnect", "disconnect"
 
 #### Methods
-* **(constructor)**(< _array_ >|< _object_ >sshConfig, < _boolean_ >disableCache) - Creates and returns a new SSH2Promise instance. Single or multiple sshconfigs can be passed. sshConfig passed to SSH2Promise is aligned to [ssh2](https://www.npmjs.com/package/ssh2) library. It has few extra options other than ssh2 configuration. 
+* **(constructor)**(< _array_ >|< _object_ >sshConfig, < _(Promise)_ >disableCache) - Creates and returns a new SSH2Promise instance. Single or multiple sshconfigs can be passed. sshConfig passed to SSH2Promise is aligned to [ssh2](https://www.npmjs.com/package/ssh2) library. It has few extra options other than ssh2 configuration. 
   * **host** - _string_ - Hostname or IP address of the server. **Default:** `'localhost'`
 
   * **port** - _integer_ - Port number of the server. **Default:** `22`
 
-  * **forceIPv4** - _boolean_ - Only connect via resolved IPv4 address for `host`. **Default:** `false`
+  * **forceIPv4** - _(Promise)_ - Only connect via resolved IPv4 address for `host`. **Default:** `false`
 
-  * **forceIPv6** - _boolean_ - Only connect via resolved IPv6 address for `host`. **Default:** `false`
+  * **forceIPv6** - _(Promise)_ - Only connect via resolved IPv6 address for `host`. **Default:** `false`
 
   * **hostHash** - _string_ - 'md5' or 'sha1'. The host's key is hashed using this method and passed to the **hostVerifier** function. **Default:** (none)
 
@@ -266,7 +321,7 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
   * **agent** - _string_ - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication. **Windows users: set to 'pageant' for authenticating with Pageant or (actual) path to a cygwin "UNIX socket."** **Default:** (none)
 
-  * **agentForward** - _boolean_ - Set to `true` to use OpenSSH agent forwarding (`auth-agent@openssh.com`) for the life of the connection. `agent` must also be set to use this feature. **Default:** `false`
+  * **agentForward** - _(Promise)_ - Set to `true` to use OpenSSH agent forwarding (`auth-agent@openssh.com`) for the life of the connection. `agent` must also be set to use this feature. **Default:** `false`
 
   * **privateKey** - _mixed_ - _Buffer_ or _string_ that contains a private key for either key-based or hostbased user authentication (OpenSSH format). **Default:** (none)
 
@@ -276,7 +331,7 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
   * **localUsername** - _string_ - Along with **localHostname** and **privateKey**, set this to a non-empty string for hostbased user authentication. **Default:** (none)
 
-  * **tryKeyboard** - _boolean_ - Try keyboard-interactive user authentication if primary user authentication method fails. If you set this to `true`, you need to handle the `keyboard-interactive` event. **Default:** `false`
+  * **tryKeyboard** - _(Promise)_ - Try keyboard-interactive user authentication if primary user authentication method fails. If you set this to `true`, you need to handle the `keyboard-interactive` event. **Default:** `false`
 
   * **keepaliveInterval** - _integer_ - How often (in milliseconds) to send SSH-level keepalive packets to the server (in a similar way as OpenSSH's ServerAliveInterval config option). Set to 0 to disable. **Default:** `0`
 
@@ -286,7 +341,7 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
   * **sock** - _ReadableStream_ - A _ReadableStream_ to use for communicating with the server instead of creating and using a new TCP connection (useful for connection hopping).
 
-  * **strictVendor** - _boolean_ - Performs a strict server vendor check before sending vendor-specific requests, etc. (e.g. check for OpenSSH server when using `openssh_noMoreSessions()`) **Default:** `true`
+  * **strictVendor** - _(Promise)_ - Performs a strict server vendor check before sending vendor-specific requests, etc. (e.g. check for OpenSSH server when using `openssh_noMoreSessions()`) **Default:** `true`
 
   * **algorithms** - _object_ - This option allows you to explicitly override the default transport layer algorithms used for the connection. Each value must be an array of valid algorithms for that category. The order of the algorithms in the arrays are important, with the most favorable being first. For a list of valid and default algorithm names, please review the documentation for the version of `ssh2-streams` used by this module. Valid keys:
 
@@ -312,19 +367,23 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
   * **reconnectDelay** - Delay after which reconnect should be done. **Default:** `'5000'`. 
 
-* **connect**() - Try to establish a connection. No need to explicitly call connect method. It get called automatically, while doing operation.
+* **connect**() - _(Promise)_ - Try to establish a connection. No need to explicitly call connect method. It get called automatically, while doing operation.
 
-* **exec**(< _string_ >cmd, < _array_ >params, < _objects_ >options) - Execute a cmd, return a result. Options are passed directly to ssh2 exec command.
+* **exec**(< _string_ >cmd, < _array_ >params, < _objects_ >options) - _(Promise)_ - Execute a cmd, return a result. Options are passed directly to ssh2 exec command.
 
-* **spawn**(< _string_ >cmd, < _array_ >params, < _objects_ >options) - Spawn a cmd, return a stream. Options are passed directly to ssh2 exec command.
+* **spawn**(< _string_ >cmd, < _array_ >params, < _objects_ >options) - _(Promise)_ - Spawn a cmd, return a stream. Options are passed directly to ssh2 exec command.
 
-* **sftp**() - Get a sftp session.
+* **sftp**([< _(Promise)_ >createNew]) - _(Promise)_ - Get a new sftp session, if establishing sftp session for first time or createNew flag is true. 
 
-* **shell**() - Get a shell session.
+* **subsys**(< _string_ >subsystem) - _(Promise)_ - Invoke a subsystem.
 
-* **close**() - Close the sshconnection and associated tunnels.
+* **x11**(< _string_ >cmd) - _(Promise)_ - Start a x11 forwarding, by invoking 'cmd' on remote server. It handles error scenario, such as if x11 command not installed on remote server, x11 forwarding not enabled on remote server, & x11 server not running locally, by rejecting it gracefully.   
 
-* **addTunnel**(< _object_ >tunnelConfig) - Establish a forward tunnel over ssh machine. TunnelConfig has following properties.
+* **shell**() - _(Promise)_ - Get a shell session.
+
+* **close**() - _(Promise)_ - Close the sshconnection and associated tunnels.
+
+* **addTunnel**(< _object_ >tunnelConfig) - _(Promise)_ - Establish a forward tunnel over ssh machine. TunnelConfig has following properties.
   * **name** - Unique name. **Default:** `'${remoteAddr}@${remotePort}'`
   
   * **remoteAddr** - Remote Address to connect.
@@ -335,15 +394,169 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 
 * **getTunnel**(< _string_ >name) - Get a tunnel by name.
 
-* **closeTunnel**([< _string_ >name]) - Close a tunnel, if name is passed. Otherwise, will close all the tunnels.
+* **closeTunnel**([< _string_ >name]) - _(Promise)_ - Close a tunnel, if name is passed. Otherwise, will close all the tunnels.
 
-* **getSocksPort**() - Start a socks server. And, return a socks port, for reverse tunneling purpose.
+* **getSocksPort**([< _number_ >localPort]) - _(Promise)_ - Start a socks server. And, return a socks port, for reverse tunneling purpose.  localPort is optional. By default, it will bind to a random port, if not passed.
 
 ## SFTP
-It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md).
+It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readFile`, `writeFile`, `changeMode`, `changeOwner`.
 
 #### Methods
 * **(constructor)**(< _object_ > ssh2) - Creates and returns a new SFTP instance, which can perform all sftp client operation such readdir, mkdir etc... in promisify way.
+
+* **fastGet**(< _string_ >remotePath, < _string_ >localPath[, < _object_ >options]) - _(Promise)_ - Downloads a file at `remotePath` to `localPath` using parallel reads for faster throughput. `options` can have the following properties:
+
+    * **concurrency** - _integer_ - Number of concurrent reads **Default:** `64`
+
+    * **chunkSize** - _integer_ - Size of each read in bytes **Default:** `32768`
+
+    * **step** - _function_(< _integer_ >total_transferred, < _integer_ >chunk, < _integer_ >total) - Called every time a part of a file was transferred
+
+* **fastPut**(< _string_ >localPath, < _string_ >remotePath[, < _object_ >options])  - _(Promise)_ - Uploads a file from `localPath` to `remotePath` using parallel reads for faster throughput. `options` can have the following properties:
+
+    * **concurrency** - _integer_ - Number of concurrent reads **Default:** `64`
+
+    * **chunkSize** - _integer_ - Size of each read in bytes **Default:** `32768`
+
+    * **step** - _function_(< _integer_ >total_transferred, < _integer_ >chunk, < _integer_ >total) - Called every time a part of a file was transferred
+
+    * **mode** - _mixed_ - Integer or string representing the file mode to set for the uploaded file.
+
+* **createReadStream**(< _string_ >path[, < _object_ >options]) - _(Promise)_ - if resolved successfully, returns a new readable stream for `path`. `options` has the following defaults:
+
+    ```javascript
+    { flags: 'r',
+      encoding: null,
+      handle: null,
+      mode: 0o666,
+      autoClose: true
+    }
+    ```
+
+    `options` can include `start` and `end` values to read a range of bytes from the file instead of the entire file. Both `start` and `end` are inclusive and start at 0. The `encoding` can be `'utf8'`, `'ascii'`, or `'base64'`.
+
+    If `autoClose` is false, then the file handle won't be closed, even if there's an error. It is your responsiblity to close it and make sure there's no file handle leak. If `autoClose` is set to true (default behavior), on `error` or `end` the file handle will be closed automatically.
+
+    An example to read the last 10 bytes of a file which is 100 bytes long:
+
+    ```javascript
+    sftp.createReadStream('sample.txt', {start: 90, end: 99});
+    ```
+
+* **createWriteStream**(< _string_ >path[, < _object_ >options]) - _(Promise)_ - if resolved successfully, returns a new writable stream for `path`. `options` has the following defaults:
+
+    ```javascript
+    {
+      flags: 'w',
+      encoding: null,
+      mode: 0o666,
+      autoClose: true
+    }
+    ```
+
+    `options` may also include a `start` option to allow writing data at some position past the beginning of the file. Modifying a file rather than replacing it may require a flags mode of 'r+' rather than the default mode 'w'.
+
+    If 'autoClose' is set to false and you pipe to this stream, this stream will not automatically close after there is no more data upstream -- allowing future pipes and/or manual writes.
+
+* **open**(< _string_ >filename, < _string_ >flags, [< _mixed_ >attrs_mode]) - _(Promise)_ - Opens a file `filename` with `flags` with optional _ATTRS_ object or file mode `attrs_mode`. `flags` is any of the flags supported by `fs.open` (except sync flag). if promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
+
+* **close**(< _Buffer_ >handle) - _(Promise)_ - Closes the resource associated with `handle` given by open() or opendir(). if promise got rejected, then return < _Error_ >err.
+
+* **readFile**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. if promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
+
+* **writeFile**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. if promise got rejected, then return < _Error_ >err.
+
+* **getStat**(< _string_ >filename) - _(Promise)_ - Retrieves attributes for the resource associated with `file`. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+
+* **setStat**(< _string_ >filename, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for the resource associated with `file`. if promise got rejected, then return < _Error_ >err.
+
+* **changeTimestamp**(< _string_ >filename, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for the resource associated with `file`. `atime` and `mtime` can be Date instances or UNIX timestamps. if promise got rejected, then return < _Error_ >err.
+
+* **changeOwner**(< _string_ >filename, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for the resource associated with `file`. if promise got rejected, then return < _Error_ >err.
+
+* **changeMode**(< _string_ >filename, < _mixed_ >mode) - _(Promise)_ - Sets the mode for the resource associated with `file`. `mode` can be an integer or a string containing an octal number. if promise got rejected, then return < _Error_ >err.
+
+* **opendir**(< _string_ >path) - _(Promise)_ - Opens a directory `path`. if promise resolved successfully, then return < _Buffer_ >handle, otherwise < _Error_ >err.
+
+* **readdir**(< _mixed_ >location) - _(Promise)_ - Retrieves a directory listing. `location` can either be a _Buffer_ containing a valid directory handle from opendir() or a _string_ containing the path to a directory. if promise resolved successfully, then return < _mixed_ >list, otherwise < _Error_ >err. `list` is an _Array_ of `{ filename: 'foo', longname: '....', attrs: {...} }` style objects (attrs is of type _ATTR_). If `location` is a directory handle, this function may need to be called multiple times until `list` is boolean false, which indicates that no more directory entries are available for that directory handle.
+
+* **unlink**(< _string_ >path) - _(Promise)_ - Removes the file/symlink at `path`. if promise got rejected, then return < _Error_ >err.
+
+* **rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - Renames/moves `srcPath` to `destPath`. if promise got rejected, then return < _Error_ >err.
+
+* **mkdir**(< _string_ >path, [< _ATTRS_ >attributes, ]) - _(Promise)_ - Creates a new directory `path`. if promise got rejected, then return < _Error_ >err.
+
+* **rmdir**(< _string_ >path) - _(Promise)_ - Removes the directory at `path`. if promise got rejected, then return < _Error_ >err.
+
+* **stat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+
+* **lstat**(< _string_ >path) - _(Promise)_ - Retrieves attributes for `path`. If `path` is a symlink, the link itself is stat'ed instead of the resource it refers to. if promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
+
+* **setstat**(< _string_ >path, < _ATTRS_ >attributes) - _(Promise)_ - Sets the attributes defined in `attributes` for `path`. if promise got rejected, then return < _Error_ >err.
+
+* **utimes**(< _string_ >path, < _mixed_ >atime, < _mixed_ >mtime) - _(Promise)_ - Sets the access time and modified time for `path`. `atime` and `mtime` can be Date instances or UNIX timestamps. if promise got rejected, then return < _Error_ >err.
+
+* **chown**(< _string_ >path, < _integer_ >uid, < _integer_ >gid) - _(Promise)_ - Sets the owner for `path`. if promise got rejected, then return < _Error_ >err.
+
+* **chmod**(< _string_ >path, < _mixed_ >mode) - _(Promise)_ - Sets the mode for `path`. `mode` can be an integer or a string containing an octal number. if promise got rejected, then return < _Error_ >err.
+
+* **readlink**(< _string_ >path) - _(Promise)_ - Retrieves the target for a symlink at `path`. if promise resolved successfully, then return < _string_ >target, otherwise < _Error_ >err.
+
+* **symlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - Creates a symlink at `linkPath` to `targetPath`. if promise got rejected, then return < _Error_ >err.
+
+* **realpath**(< _string_ >path) - _(Promise)_ - Resolves `path` to an absolute path. if promise resolved successfully, then return < _string_ >absPath, otherwise < _Error_ >err.
+
+* **ext_openssh_rename**(< _string_ >srcPath, < _string_ >destPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX rename(3) from `srcPath` to `destPath`. if promise got rejected, then return < _Error_ >err.
+
+* **ext_openssh_statvfs**(< _string_ >path) - _(Promise)_ - **OpenSSH extension** Performs POSIX statvfs(2) on `path`. if promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
+
+* **ext_openssh_fstatvfs**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fstatvfs(2) on open handle `handle`. if promise resolved successfully, then return < _object_ >fsInfo, otherwise < _Error_ >err. `fsInfo` contains the information as found in the [statvfs struct](http://linux.die.net/man/2/statvfs).
+
+* **ext_openssh_hardlink**(< _string_ >targetPath, < _string_ >linkPath) - _(Promise)_ - **OpenSSH extension** Performs POSIX link(2) to create a hard link to `targetPath` at `linkPath`. if promise got rejected, then return < _Error_ >err.
+
+* **ext_openssh_fsync**(< _Buffer_ >handle) - _(Promise)_ - **OpenSSH extension** Performs POSIX fsync(3) on the open handle `handle`. if promise got rejected, then return < _Error_ >err.
+
+#### ATTRS
+
+An object with the following valid properties:
+
+* **mode** - _integer_ - Mode/permissions for the resource.
+
+* **uid** - _integer_ - User ID of the resource.
+
+* **gid** - _integer_ - Group ID of the resource.
+
+* **size** - _integer_ - Resource size in bytes.
+
+* **atime** - _integer_ - UNIX timestamp of the access time of the resource.
+
+* **mtime** - _integer_ - UNIX timestamp of the modified time of the resource.
+
+When supplying an ATTRS object to one of the SFTP methods:
+
+* `atime` and `mtime` can be either a Date instance or a UNIX timestamp.
+
+* `mode` can either be an integer or a string containing an octal number.
+
+
+#### Stats
+
+An object with the same attributes as an ATTRS object with the addition of the following methods:
+
+* `stats.isDirectory()`
+
+* `stats.isFile()`
+
+* `stats.isBlockDevice()`
+
+* `stats.isCharacterDevice()`
+
+* `stats.isSymbolicLink()`
+
+* `stats.isFIFO()`
+
+* `stats.isSocket()`
+
 
 # LICENSE
 

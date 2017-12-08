@@ -37,10 +37,26 @@ module.exports = {
             output: mutableStdout,
             terminal: true
         });
-        rl.question('Password: ', function(password) {
+        rl.question(question, function(password) {
             cb(password);
             rl.close();
         });
         mutableStdout.muted = true;
+    },
+
+    /**
+     * Create a Deferred promise
+     */
+    createDeferredPromise: function(){
+        var __resolve, __reject;
+        var __promise = new Promise((resolve, reject) => {
+            __resolve = resolve;
+            __reject = reject;
+        })
+        return {
+            promise: __promise,
+            resolve: __resolve,
+            reject: __reject
+        }
     }
 }

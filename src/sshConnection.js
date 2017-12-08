@@ -25,6 +25,7 @@ class SSHConnection extends EventEmitter {
         this.__retries = 0;
         this.__err = null;
         this.__sftp = null;
+        this.__x11 = null;
     }
 
    /**
@@ -72,6 +73,21 @@ class SSHConnection extends EventEmitter {
             }
             return this.__sftp;
         });
+    }
+
+    /**
+     * Get a subsys
+     */
+    subsys(cmd) {
+        return this.connect().then(() => {
+            return new Promise((resolve, reject) => {
+                this.sshConnection.subsys(cmd, (err, stream) => {
+                    if (err)
+                        return reject(err);
+                    resolve(stream);
+                });
+            });
+        })
     }
 
     /**
@@ -126,9 +142,31 @@ class SSHConnection extends EventEmitter {
     /**
      * Get a Socks Port
      */
-    getSocksPort() {
-        return this.addTunnel({ name: "__socksServer", socks: true }).then((tunnel) => {
+    getSocksPort(localPort) {
+        return this.addTunnel({ name: "__socksServer", socks: true, localPort: localPort }).then((tunnel) => {
             return tunnel.localPort;
+        });
+    }
+
+    /**
+     * Get a X11 port
+     */
+    x11(cmd) {
+        return this.spawn(cmd, null, { x11: true }).then((stream) => {
+            this.__x11 = SSHUtils.createDeferredPromise();
+            var code = 0;
+            stream.on('end', () => {
+                if (code !== 0) {
+                    this.__x11.reject("X11 forwading not enabled on server");
+                    this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X11 forwading not enabled on server"});
+                }
+            }).on('exit', (exitcode) => {
+                code = exitcode;
+            });
+            this.__x11.promise.catch(() => {
+                stream.close();
+            });
+            return this.__x11.promise;
         });
     }
 
@@ -192,6 +230,19 @@ class SSHConnection extends EventEmitter {
                 this.__retries = 0;
                 this.__err = null;
                 resolve(this);
+            }).on('x11', (info, accept, reject) => {
+                var xserversock = new net.Socket();
+                xserversock.on('connect', () => {
+                  var xclientsock = accept();
+                  xclientsock.pipe(xserversock).pipe(xclientsock);
+                  this.__x11.resolve();
+                  this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.CONNECT);
+                }).on('error', (err) => {
+                    this.__x11.reject("X Server not running locally.");
+                    this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X Server not running locally."})
+                });
+                // connects to localhost:0.0 
+                xserversock.connect(6000, 'localhost');
             }).on('error', (err) => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
                 this.__err = err;
@@ -226,7 +277,7 @@ class SSHConnection extends EventEmitter {
      * Add new tunnel if not exist
      */
     addTunnel(tunnelConfig) {
-        tunnelConfig.name = tunnelConfig.name || (!tunnelConfig.socks?`${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`:'__socksServer');
+        tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
         if (this.getTunnel(tunnelConfig.name)) {
             return Promise.resolve(this.getTunnel(tunnelConfig.name))
         } else {

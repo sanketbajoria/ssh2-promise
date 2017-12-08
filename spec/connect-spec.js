@@ -18,6 +18,7 @@ describe("connect to dummy server", function () {
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
+            expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
             sshTunnel.close();
@@ -30,6 +31,7 @@ describe("connect to dummy server", function () {
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
+            expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
             sshTunnel.close();
@@ -42,6 +44,7 @@ describe("connect to dummy server", function () {
         delete c.password;
         var sshTunnel = new SSHTunnel(c);
         sshTunnel.connect().then((ssh) => {
+            expect('1').toBe('2');
             expect(ssh).toBeUndefined();
         }, (error) => {
             expect(error).toBeDefined();
@@ -97,6 +100,7 @@ describe("connect to dummy server", function () {
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
+            expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
             sshTunnel.close();
@@ -111,6 +115,7 @@ describe("connect to dummy server", function () {
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
+            expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
             sshTunnel.close();
