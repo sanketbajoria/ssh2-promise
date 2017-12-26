@@ -14,7 +14,22 @@ describe("sftp cmd", function () {
     beforeAll(() => {
         sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
         sftp = new SSHTunnel.SFTP(sshTunnel);
-    })
+    });
+
+   /*  it("read/write file", function (done) {
+        (async function(){
+            try{
+                //await sftp.writeFile('/dummy', "testing123");
+                expect(1).toBe(1);
+                var content = await sftp.readFile('/dummy', "utf8");
+                expect(content).toBe("testing123");
+            }catch(err){
+                expect(1).toBe(0);
+            }finally{
+                done();
+            }
+        })();
+    }); */
 
     it("read dir", function (done) {
         sftp.readdir("/").then((data) => {

@@ -399,7 +399,7 @@ ssh.subsys('sftp').then((stream) => {
 * **getSocksPort**([< _number_ >localPort]) - _(Promise)_ - Start a socks server. And, return a socks port, for reverse tunneling purpose.  localPort is optional. By default, it will bind to a random port, if not passed.
 
 ## SFTP
-It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readFile`, `writeFile`, `changeMode`, `changeOwner`.
+It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readData`, `writeData`, `changeMode`, `changeOwner`.
 
 #### Methods
 * **(constructor)**(< _object_ > ssh2) - Creates and returns a new SFTP instance, which can perform all sftp client operation such readdir, mkdir etc... in promisify way.
@@ -462,9 +462,13 @@ It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SF
 
 * **close**(< _Buffer_ >handle) - _(Promise)_ - Closes the resource associated with `handle` given by open() or opendir(). If promise is rejected, then return < _Error_ >err.
 
-* **readFile**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. If promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
+* **readFile**(< _string_ >path, [< _string_|_object_ >encoding]) - _(Promise)_ - Reads file content at given `path`. Default `encoding` is `null`. If promise resolved successfully, then (if encoding is defined, then return < _string_ >content otherwise return < _buffer_ >content), otherwise < _Error_ >err.
 
-* **writeFile**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. If promise is rejected, then return < _Error_ >err.
+* **writeFile**(< _string_ >path, < _string_ >data, [< _object_ >options]) - _(Promise)_ - Writes `data` at given `path`. `options` can have two properties `encoding` and `flag`, Default encoding is `utf8`, and flag is `w`. If promise is rejected, then return < _Error_ >err.
+
+* **readData**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. If promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
+
+* **writeData**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. If promise is rejected, then return < _Error_ >err.
 
 * **getStat**(< _string_ >filename) - _(Promise)_ - Retrieves attributes for the resource associated with `file`. If promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
 
