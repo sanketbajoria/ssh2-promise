@@ -16,7 +16,7 @@ describe("sftp cmd", function () {
         sftp = new SSHTunnel.SFTP(sshTunnel);
     });
 
-   /*  it("read/write file", function (done) {
+   it("read/write file", function (done) {
         (async function(){
             try{
                 //await sftp.writeFile('/dummy', "testing123");
@@ -29,7 +29,7 @@ describe("sftp cmd", function () {
                 done();
             }
         })();
-    }); */
+    });
 
     it("read dir", function (done) {
         sftp.readdir("/").then((data) => {

@@ -33,7 +33,7 @@ class SFTP extends EventEmitter {
                             return this.ssh.sftp();    
                         }).then((sftp) => {
                             var executed = sftp[m].apply(sftp, params);
-                            if (!executed) {
+                            if (executed === false) {
                                 $ready = new Promise((resolve, reject) => {
                                     __resolve = resolve;
                                     recur();
