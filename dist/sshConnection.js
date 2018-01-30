@@ -1,46 +1,41 @@
-const EventEmitter = require('events'),
-    SSH2 = require('ssh2'),
-    net = require('net'),
-    fs = require('fs'),
-    socks = require('socksv5'),
-    SSHUtils = require('./sshUtils');
-    SSHConstants = require('./sshConstants');
-
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const events_1 = require("events");
+const net = require("net");
+const fs = require("fs");
+const sshConstants_1 = require("./sshConstants");
+const sshUtils_1 = require("./sshUtils");
+const SSH2 = require('ssh2'), socks = require('socksv5');
 var defaultOptions = {
     reconnect: true,
     port: 22,
     reconnectTries: 10,
     reconnectDelay: 5000
 };
-
-class SSHConnection extends EventEmitter {
-
+class SSHConnection extends events_1.EventEmitter {
     constructor(options) {
         super();
-        this.config = Object.assign({}, defaultOptions, options);
-        this.config.uniqueId = this.config.uniqueId || `${this.config.username}@${this.config.host}`;
         this.activeTunnels = {};
         this.__$connectPromise = null;
         this.__retries = 0;
         this.__err = null;
         this.__sftp = null;
         this.__x11 = null;
+        this.sshConnection = null;
+        this.config = Object.assign({}, defaultOptions, options);
+        this.config.uniqueId = this.config.uniqueId || `${this.config.username}@${this.config.host}`;
     }
-
-   /**
-     * Emit message on this channel
-     * @param {*} channel 
-     * @param {*} status 
-     * @param {*} ssh 
-     * @param {*} payload 
-     */
+    /**
+      * Emit message on this channel
+      * @param {*} channel
+      * @param {*} status
+      * @param {*} ssh
+      * @param {*} payload
+      */
     emit(channel, status, payload) {
         super.emit(channel, status, this, payload);
-        super.emit(`${channel}:${status}`, this, payload);
+        return super.emit(`${channel}:${status}`, this, payload);
     }
-
-
     /**
      * Get shell socket
      */
@@ -54,9 +49,8 @@ class SSHConnection extends EventEmitter {
                     resolve(stream);
                 });
             });
-        })
+        });
     }
-
     /**
      * Get a sftp session
      */
@@ -74,7 +68,6 @@ class SSHConnection extends EventEmitter {
             return this.__sftp;
         });
     }
-
     /**
      * Get a subsys
      */
@@ -87,9 +80,8 @@ class SSHConnection extends EventEmitter {
                     resolve(stream);
                 });
             });
-        })
+        });
     }
-
     /**
      * Spawn a command
      */
@@ -107,14 +99,13 @@ class SSHConnection extends EventEmitter {
                         console.log(`Closed stream - ${cmd}`);
                     });
                     stream.kill = function () {
-                        SSHUtils.endSocket(stream);
-                    }
+                        sshUtils_1.default.endSocket(stream);
+                    };
                     resolve(stream);
-                })
-            })
-        })
+                });
+            });
+        });
     }
-
     /**
      * Exec a command
      */
@@ -134,11 +125,10 @@ class SSHConnection extends EventEmitter {
                     }).stderr.on('data', function (data) {
                         reject(data);
                     });
-                })
-            })
-        })
+                });
+            });
+        });
     }
-
     /**
      * Get a Socks Port
      */
@@ -147,18 +137,17 @@ class SSHConnection extends EventEmitter {
             return tunnel.localPort;
         });
     }
-
     /**
      * Get a X11 port
      */
     x11(cmd) {
         return this.spawn(cmd, null, { x11: true }).then((stream) => {
-            this.__x11 = SSHUtils.createDeferredPromise();
+            this.__x11 = sshUtils_1.default.createDeferredPromise();
             var code = 0;
-            stream.on('end', () => {
+            stream.on('end', (err) => {
                 if (code !== 0) {
                     this.__x11.reject("X11 forwading not enabled on server");
-                    this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X11 forwading not enabled on server"});
+                    this.emit(sshConstants_1.default.CHANNEL.X11, sshConstants_1.default.STATUS.DISCONNECT, { err: err, msg: "X11 forwading not enabled on server" });
                 }
             }).on('exit', (exitcode) => {
                 code = exitcode;
@@ -169,89 +158,82 @@ class SSHConnection extends EventEmitter {
             return this.__x11.promise;
         });
     }
-
     /**
      * Close SSH Connection
      */
     close() {
-        this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT);
+        this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.BEFOREDISCONNECT);
         return this.closeTunnel().then(() => {
-            if (this.sshConnection){
+            if (this.sshConnection) {
                 this.sshConnection.end();
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT);
+                this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.DISCONNECT);
             }
         });
     }
-
     /**
      * Connect the SSH Connection
      */
     connect(c) {
         this.config = Object.assign(this.config, c);
         ++this.__retries;
-
         if (this.__$connectPromise != null)
             return this.__$connectPromise;
-
-        this.__$connectPromise = new Promise((resolve, reject, notify) => {
-            this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFORECONNECT);
+        this.__$connectPromise = new Promise((resolve, reject) => {
+            this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.BEFORECONNECT);
             if (!this.config || typeof this.config === 'function' || !this.config.host || !this.config.username) {
                 reject("Invalid SSH connection configuration host/username can't be empty");
                 this.__$connectPromise = null;
                 return;
             }
-
             if (this.config.tryKeyboard && !this.config.password && typeof this.config !== 'undefined') {
                 delete this.config.password;
             }
-
             if (this.config.identity) {
                 if (fs.existsSync(this.config.identity)) {
                     this.config.privateKey = fs.readFileSync(this.config.identity);
                 }
                 delete this.config.identity;
             }
-
             //Start ssh server connection
             this.sshConnection = new SSH2();
             this.sshConnection.on('keyboard-interactive', (name, instructions, lang, prompts, finish) => {
                 prompts.forEach((prompt) => {
-                    SSHUtils.prompt(prompt.prompt, (password) => {
+                    sshUtils_1.default.prompt(prompt.prompt, (password) => {
                         finish([password]);
-                    })
+                    });
                 });
             }).on('ready', (err) => {
                 if (err) {
-                    this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, { err: err });
+                    this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.DISCONNECT, { err: err });
                     this.__$connectPromise = null;
                     return reject(err);
                 }
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
+                this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.CONNECT);
                 this.__retries = 0;
                 this.__err = null;
                 resolve(this);
             }).on('x11', (info, accept, reject) => {
                 var xserversock = new net.Socket();
                 xserversock.on('connect', () => {
-                  var xclientsock = accept();
-                  xclientsock.pipe(xserversock).pipe(xclientsock);
-                  this.__x11.resolve();
-                  this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.CONNECT);
+                    var xclientsock = accept();
+                    xclientsock.pipe(xserversock).pipe(xclientsock);
+                    this.__x11.resolve();
+                    this.emit(sshConstants_1.default.CHANNEL.X11, sshConstants_1.default.STATUS.CONNECT);
                 }).on('error', (err) => {
                     this.__x11.reject("X Server not running locally.");
-                    this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X Server not running locally."})
+                    this.emit(sshConstants_1.default.CHANNEL.X11, sshConstants_1.default.STATUS.DISCONNECT, { err: err, msg: "X Server not running locally." });
                 });
                 // connects to localhost:0.0 
                 xserversock.connect(6000, 'localhost');
             }).on('error', (err) => {
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
+                this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.DISCONNECT, { err: err });
                 this.__err = err;
                 reject(err);
                 this.__$connectPromise = null;
             }).on('continue', () => {
-               this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE); 
-            }).on('close', (hadError) => {
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: this.__err});
+                this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.CONTINUE);
+            }).on('close', () => {
+                this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.DISCONNECT, { err: this.__err });
                 reject(this.__err);
                 this.__$connectPromise = null;
                 if (this.__err != null && this.__err.level != "client-authentication" && this.__err.code != 'ENOTFOUND') {
@@ -265,81 +247,75 @@ class SSHConnection extends EventEmitter {
         });
         return this.__$connectPromise;
     }
-
     /**
      * Get existing tunnel by name
      */
     getTunnel(name) {
         return this.activeTunnels[name];
     }
-
     /**
      * Add new tunnel if not exist
      */
     addTunnel(tunnelConfig) {
         tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
         if (this.getTunnel(tunnelConfig.name)) {
-            return Promise.resolve(this.getTunnel(tunnelConfig.name))
-        } else {
+            return Promise.resolve(this.getTunnel(tunnelConfig.name));
+        }
+        else {
             return new Promise((resolve, reject) => {
                 var server;
                 if (tunnelConfig.socks) {
                     server = socks.createServer((info, accept, deny) => {
                         this.connect().then(() => {
-                            this.sshConnection.forwardOut(info.srcAddr,
-                                info.srcPort,
-                                info.dstAddr,
-                                info.dstPort,
-                                (err, stream) => {
-                                    if (err) {
-                                        this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
-                                        return deny();
-                                    }
-                                    var clientSocket;
-                                    if (clientSocket = accept(true)) {
-                                        stream.pipe(clientSocket).pipe(stream).on('close', () => {
-                                            stream.end();
-                                        });
-                                    } else if (stream) {
-                                        stream.end();
-                                    }
-                                });
-                        });
-                    }).useAuth(socks.auth.None());
-                } else {
-                    server = net.createServer()
-                        .on('connection', (socket) => {
-                            this.connect().then(() => {
-                                this.sshConnection.forwardOut('', 0, tunnelConfig.remoteAddr, tunnelConfig.remotePort, (err, stream) => {
-                                    if (err) {
-                                        this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
-                                        return err;
-                                    }
-                                    stream.pipe(socket).pipe(stream).on('close', () => {
+                            this.sshConnection.forwardOut(info.srcAddr, info.srcPort, info.dstAddr, info.dstPort, (err, stream) => {
+                                if (err) {
+                                    this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: tunnelConfig, err: err });
+                                    return deny();
+                                }
+                                var clientSocket;
+                                if (clientSocket = accept(true)) {
+                                    stream.pipe(clientSocket).pipe(stream).on('close', () => {
                                         stream.end();
                                     });
+                                }
+                                else if (stream) {
+                                    stream.end();
+                                }
+                            });
+                        });
+                    }).useAuth(socks.auth.None());
+                }
+                else {
+                    server = net.createServer()
+                        .on('connection', (socket) => {
+                        this.connect().then(() => {
+                            this.sshConnection.forwardOut('', 0, tunnelConfig.remoteAddr, tunnelConfig.remotePort, (err, stream) => {
+                                if (err) {
+                                    this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: tunnelConfig, err: err });
+                                    return err;
+                                }
+                                stream.pipe(socket).pipe(stream).on('close', () => {
+                                    stream.end();
                                 });
                             });
                         });
+                    });
                 }
-
                 tunnelConfig.localPort = tunnelConfig.localPort || 0;
                 server.on('listening', () => {
                     tunnelConfig.localPort = server.address().port;
                     this.activeTunnels[tunnelConfig.name] = Object.assign({}, { server: server }, tunnelConfig);
-                    this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.CONNECT, {tunnelConfig: tunnelConfig});
+                    this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.CONNECT, { tunnelConfig: tunnelConfig });
                     resolve(this.activeTunnels[tunnelConfig.name]);
                 }).on('error', (err) => {
-                    this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
+                    this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: tunnelConfig, err: err });
                     server.close();
                     reject(err);
                     delete this.activeTunnels[name];
                 }).listen(tunnelConfig.localPort);
-
             });
         }
     }
-
     /**
      * Close the tunnel
      */
@@ -347,19 +323,18 @@ class SSHConnection extends EventEmitter {
         return new Promise((resolve, reject) => {
             if (name && this.activeTunnels[name]) {
                 var tunnel = this.activeTunnels[name];
-                this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.BEFOREDISCONNECT, {tunnelConfig: tunnel});
+                this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.BEFOREDISCONNECT, { tunnelConfig: tunnel });
                 tunnel.server.close(() => {
-                    this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: this.activeTunnels[name]});
+                    this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: this.activeTunnels[name] });
                     delete this.activeTunnels[name];
                     resolve();
                 });
-            } else if (!name) {
+            }
+            else if (!name) {
                 var tunnels = Object.keys(this.activeTunnels).map((key) => this.closeTunnel(key));
                 resolve(Promise.all(tunnels));
             }
         });
     }
-
 }
-
-module.exports = SSHConnection;
+exports.default = SSHConnection;

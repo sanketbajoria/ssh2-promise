@@ -1,5 +1,5 @@
-var SSHTunnel = require("../src/index");
-var SSHConstants = require("../src/index").Constants;
+var SSHTunnel = require("../dist/index");
+var SSHConstants = require("../dist/index").Constants;
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 Promise.prototype.finally = function (cb) {

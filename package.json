@@ -1,8 +1,9 @@
 {
   "name": "ssh2-promise",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Promise wrapper around SSH2 library",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/sanketbajoria/ssh2-promise"
@@ -12,6 +13,7 @@
   },
   "keywords": [
     "ssh2",
+    "ssh2 typescript",
     "ssh2-promise",
     "ssh-promise",
     "sftp-promise",
@@ -24,7 +26,10 @@
     "cache ssh",
     "retry ssh",
     "sftp promise",
-    "sftp async await"
+    "sftp async await",
+    "ssh2 typescript promise",
+    "tunnel typescript",
+    "typescript ssh2 async await"
   ],
   "author": "Sanket Bajoria",
   "license": "MIT",
@@ -33,7 +38,11 @@
     "ssh2": "^0.5.5"
   },
   "devDependencies": {
+    "@types/node": "^8.5.5",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.2.3",
     "jasmine": "^2.8.0",
-    "mock-stdin": "^0.3.1"
+    "mock-stdin": "^0.3.1",
+    "typescript": "^2.6.2"
   }
 }

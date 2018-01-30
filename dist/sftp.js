@@ -1,20 +1,18 @@
-const EventEmitter = require('events'),
-    SSHConstants = require('./sshConstants');
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const events_1 = require("events");
+const sshConstants_1 = require("./sshConstants");
 var stringFlagMap = ['r', 'r+', 'w', 'wx', 'xw', 'w+', 'wx+', 'xw+', 'a', 'ax', 'xa', 'a+', 'ax+', 'xa+'];
-
 var methods = ["fastGet", "fastPut", "open", "close", "readFile", "writeFile", "read", "write", "fstat", "fsetstat", "futimes", "fchown", "fchmod", "opendir", "readdir", "unlink", "rename", "mkdir", "rmdir", "stat", "lstat", "setstat", "utimes", "chown", "chmod", "readlink", "symlink", "realpath", "ext_openssh_rename", "ext_openssh_statvfs", "ext_openssh_fstatvfs", "ext_openssh_hardlink", "ext_openssh_fsync"];
-
-var enhanceMethods = {"readData": "read", "writeData": "write", "getStat": "fstat", "setStat": "fsetstat", "changeTimestamp": "futimes", "changeOwner": "fchown", "changeMode": "fchmod"};
-
-class SFTP extends EventEmitter {
+var enhanceMethods = { "readData": "read", "writeData": "write", "getStat": "fstat", "setStat": "fsetstat", "changeTimestamp": "futimes", "changeOwner": "fchown", "changeMode": "fchmod" };
+class SFTP extends events_1.EventEmitter {
     constructor(ssh) {
         super();
         this.ssh = ssh;
         var __resolve = null;
         var $ready = Promise.resolve();
-        this.ssh.on(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`, () => {
-            if(__resolve){
+        this.ssh.on(`${sshConstants_1.default.CHANNEL.SSH}:${sshConstants_1.default.STATUS.CONTINUE}`, () => {
+            if (__resolve) {
                 __resolve();
             }
         });
@@ -26,11 +24,11 @@ class SFTP extends EventEmitter {
                         if (arguments[0])
                             reject(arguments[0]);
                         var params = [...arguments].slice(1);
-                        params.length==1?resolve(params[0]):resolve(params);
+                        params.length == 1 ? resolve(params[0]) : resolve(params);
                     });
                     var recur = () => {
                         $ready.then(() => {
-                            return this.ssh.sftp();    
+                            return this.ssh.sftp();
                         }).then((sftp) => {
                             var executed = sftp[m].apply(sftp, params);
                             if (executed === false) {
@@ -42,21 +40,21 @@ class SFTP extends EventEmitter {
                         }, (err) => {
                             reject(err);
                         });
-                    }
+                    };
                     recur();
                 });
             }.bind(this);
         });
-
         Object.keys(enhanceMethods).forEach((m) => {
             this[m] = function () {
                 var params = [...arguments];
                 var path = params[0];
                 var flag = "r+";
-                if(params[1] && stringFlagMap.indexOf(params[1]) >= 0){
+                if (params[1] && stringFlagMap.indexOf(params[1]) >= 0) {
                     flag = params[1];
                     params = params.slice(2);
-                }else{
+                }
+                else {
                     params = params.slice(1);
                 }
                 return this.open(path, flag).then((handle) => {
@@ -66,19 +64,17 @@ class SFTP extends EventEmitter {
                     }, (err) => {
                         this.close(handle);
                         return Promise.reject(err);
-                    })
+                    });
                 });
-            }
+            };
         });
     }
-
     createReadStream() {
         var params = [...arguments];
         return this.ssh.sftp().then((sftp) => {
             return sftp.createReadStream.apply(sftp, params);
         });
     }
-
     createWriteStream() {
         var params = [...arguments];
         return this.ssh.sftp().then((sftp) => {
@@ -86,5 +82,4 @@ class SFTP extends EventEmitter {
         });
     }
 }
-
-module.exports = SFTP;
+exports.default = SFTP;

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     "CHANNEL": {
         SSH: "ssh",
         TUNNEL: "tunnel",

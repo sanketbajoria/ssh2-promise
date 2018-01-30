@@ -1,4 +1,4 @@
-var SSHTunnel = require("../src/index");
+var SSHTunnel = require("../dist/index");
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 Promise.prototype.finally = function (cb) {
     const res = () => this;
@@ -19,7 +19,7 @@ describe("sftp cmd", function () {
    it("read/write file", function (done) {
         (async function(){
             try{
-                //await sftp.writeFile('/dummy', "testing123");
+                await sftp.writeFile('/dummy', "testing123");
                 expect(1).toBe(1);
                 var content = await sftp.readFile('/dummy', "utf8");
                 expect(content).toBe("testing123");

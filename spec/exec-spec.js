@@ -1,4 +1,4 @@
-var SSHTunnel = require("../src/index");
+var SSHTunnel = require("../dist/index");
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 Promise.prototype.finally = function (cb) {
     const res = () => this;

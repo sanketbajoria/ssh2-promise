@@ -2,6 +2,7 @@
 
 [ssh2-promise](https://github.com/sanketbajoria/ssh2-promise) is a powerful promise wrapper around [ssh2](https://www.npmjs.com/package/ssh2) client. It supports all the ssh2 client operation such as connection hopping, exec, spawn, shell, sftp, open tunnel, open socks connection etc... in promisify way. It helps in caching the sshconnection, to reduce time, during connection hopping. It have reconnect logic, so that, once disconnected, it can retry the sshconnection, automatically.  
 It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too. It can handle 'continue' event automatically, While doing any sftp operation.
+This module is written in `Typescript`. It can be used in `Javascript` or in `Typescript` with full type support.
 
 # Installation
 
@@ -15,7 +16,11 @@ All examples are shown in promisify and async-await manner.
 #### Require
 
 ```javascript
+//in javascript manner
 var SSH2Promise = require('ssh2-promise');
+
+//or in typescript manner
+import SSH2Promise = require('ssh2-promise');
 ```
 
 #### Connect to SSH Server
