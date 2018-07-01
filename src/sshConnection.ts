@@ -296,7 +296,9 @@ export default class SSHConnection extends EventEmitter {
      */
     addTunnel(tunnelConfig: TunnelConfig) {
         tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
+        this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.BEFORECONNECT, {tunnelConfig: tunnelConfig});
         if (this.getTunnel(tunnelConfig.name)) {
+            this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.CONNECT, {tunnelConfig: tunnelConfig});
             return Promise.resolve(this.getTunnel(tunnelConfig.name))
         } else {
             return new Promise((resolve, reject) => {
