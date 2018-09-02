@@ -37,7 +37,7 @@ declare class SSH2Promise extends EventEmitter {
     config: any;
     deregister: Array<any>;
     disableCache: boolean;
-    constructor(options: any, disableCache: boolean);
+    constructor(options: any, disableCache?: boolean);
     emit(event: string | symbol, ...args: any[]): boolean;
     /**
      * Get SSH if existing from cache otherwise create new one

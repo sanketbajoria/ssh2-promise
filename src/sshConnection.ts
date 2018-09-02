@@ -353,7 +353,7 @@ export default class SSHConnection extends EventEmitter {
                     this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
                     server.close();
                     reject(err);
-                    delete this.activeTunnels[name];
+                    delete this.activeTunnels[tunnelConfig.name];
                 }).listen(tunnelConfig.localPort);
 
             });

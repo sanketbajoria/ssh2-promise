@@ -313,7 +313,7 @@ class SSHConnection extends events_1.EventEmitter {
                     this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: tunnelConfig, err: err });
                     server.close();
                     reject(err);
-                    delete this.activeTunnels[name];
+                    delete this.activeTunnels[tunnelConfig.name];
                 }).listen(tunnelConfig.localPort);
             });
         }

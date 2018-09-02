@@ -471,9 +471,9 @@ It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SF
 
 * **writeFile**(< _string_ >path, < _string_ >data, [< _object_ >options]) - _(Promise)_ - Writes `data` at given `path`. `options` can have two properties `encoding` and `flag`, Default encoding is `utf8`, and flag is `w`. If promise is rejected, then return < _Error_ >err.
 
-* **readData**(< _string_ >filename, [< _string_ >flags], < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. Default flags is `r+`. If promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
+* **readFileData**(< _string_ >filename, < _Buffer_ >buffer, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Reads `length` bytes from the resource associated with `file` starting at `position` and stores the bytes in `buffer` starting at `offset`. If promise resolved successfully, then return Array [< _integer_ >bytesRead, < _Buffer_ >buffer (offset adjusted), < _integer_ >position], otherwise < _Error_ >err.
 
-* **writeData**(< _string_ >filename, [< _string_ >flags], < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. Default flags is `r+`. If promise is rejected, then return < _Error_ >err.
+* **writeFileData**(< _string_ >filename, < _integer_ >offset, < _integer_ >length, < _integer_ >position) - _(Promise)_ - Writes `length` bytes from `buffer` starting at `offset` to the resource associated with `file` starting at `position`. If promise is rejected, then return < _Error_ >err.
 
 * **getStat**(< _string_ >filename) - _(Promise)_ - Retrieves attributes for the resource associated with `file`. If promise resolved successfully, then return < _Stats_ >stats, otherwise < _Error_ >err.
 

@@ -84,7 +84,7 @@ class SSH2Promise extends events_1.EventEmitter {
             return o;
         });
         this.deregister = [];
-        this.disableCache = disableCache;
+        this.disableCache = disableCache || false;
         methods.forEach((m) => {
             this[m] = function () {
                 var params = arguments;
