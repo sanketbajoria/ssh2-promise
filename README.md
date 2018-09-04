@@ -404,7 +404,7 @@ ssh.subsys('sftp').then((stream) => {
 * **getSocksPort**([< _number_ >localPort]) - _(Promise)_ - Start a socks server. And, return a socks port, for reverse tunneling purpose.  localPort is optional. By default, it will bind to a random port, if not passed.
 
 ## SFTP
-It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readData`, `writeData`, `changeMode`, `changeOwner`.
+It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readFileData`, `writeFileData`, `changeMode`, `changeOwner`.
 
 #### Methods
 * **(constructor)**(< _object_ > ssh2) - Creates and returns a new SFTP instance, which can perform all sftp client operation such readdir, mkdir etc... in promisify way.
