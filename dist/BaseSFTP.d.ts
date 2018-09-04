@@ -61,7 +61,14 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Array<any>>`
      */
-    readFileData(filename: String, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>>;
+    readFileData(filename: string, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>>;
+    /**
+     * (Client-only)
+     *  Reads file content at given path. Default encoding is null.
+     *
+     * Returns `Promise<string>`
+     */
+    readFile(filename: string, encoding?: string | any): Promise<string>;
     /**
     * (Client-only)
     * Writes length bytes from buffer starting at offset to the resource associated with file starting at position.
@@ -75,7 +82,13 @@ export default abstract class BaseSFTP extends EventEmitter {
     *
     * Returns `Promise<void>`
     */
-    writeFileData(filename: String, buffer: Buffer, offset: number, length: number, position: number): Promise<void>;
+    writeFileData(filename: string, buffer: Buffer, offset: number, length: number, position: number): Promise<void>;
+    /**
+     *  Writes data at given path. options can have two properties encoding and flag, Default encoding is utf8, and flag is w.
+     *
+     * Returns `Promise<void>`
+     */
+    writeFile(filename: string, data: string, options: any): Promise<void>;
     /**
      * (Client-only)
      * Retrieves attributes for the resource associated with `handle`.
@@ -89,7 +102,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Stats>`
      */
-    getStat(filename: String): Promise<Stats>;
+    getStat(filename: string): Promise<Stats>;
     /**
      * (Client-only)
      * Sets the attributes defined in `attributes` for the resource associated with `handle`.
@@ -103,7 +116,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    setStat(filename: String, attributes: InputAttributes): Promise<void>;
+    setStat(filename: string, attributes: InputAttributes): Promise<void>;
     /**
      * (Client-only)
      * Sets the access time and modified time for the resource associated with `handle`.
@@ -117,7 +130,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeTimestamp(filename: String, atime: number | Date, mtime: number | Date): Promise<void>;
+    changeTimestamp(filename: string, atime: number | Date, mtime: number | Date): Promise<void>;
     /**
      * (Client-only)
      * Sets the owner for the resource associated with `handle`.
@@ -131,7 +144,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeOwner(filename: String, uid: number, gid: number): Promise<void>;
+    changeOwner(filename: string, uid: number, gid: number): Promise<void>;
     /**
      * (Client-only)
      * Sets the mode for the resource associated with `handle`.
@@ -145,7 +158,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeMode(filename: String, mode: number | string): Promise<void>;
+    changeMode(filename: string, mode: number | string): Promise<void>;
     /**
      * (Client-only)
      * Opens a directory `path`.
@@ -235,9 +248,9 @@ export default abstract class BaseSFTP extends EventEmitter {
     * (Client-only)
     * Retrieves the target for a symlink at `path`.
     *
-    * Returns `Promise<String>`
+    * Returns `Promise<string>`
     */
-    readlink(path: string): Promise<String>;
+    readlink(path: string): Promise<string>;
     /**
      * (Client-only)
      * Creates a symlink at `linkPath` to `targetPath`.
@@ -249,9 +262,9 @@ export default abstract class BaseSFTP extends EventEmitter {
      * (Client-only)
      * Resolves `path` to an absolute path.
      *
-     * Returns `Promise<String>`
+     * Returns `Promise<string>`
      */
-    realpath(path: string): Promise<String>;
+    realpath(path: string): Promise<string>;
     /**
      * (Client-only, OpenSSH extension)
      * Performs POSIX rename(3) from `srcPath` to `destPath`.

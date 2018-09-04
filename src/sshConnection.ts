@@ -160,7 +160,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a Socks Port
      */
-    getSocksPort(localPort:number) {
+    getSocksPort(localPort:number): Promise<number> {
         return this.addTunnel({ name: "__socksServer", socks: true, localPort: localPort }).then((tunnel) => {
             return tunnel.localPort;
         });
@@ -169,13 +169,13 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a X11 port
      */
-    x11(cmd:string) {
+    x11(cmd:string): Promise<any> {
         return this.spawn(cmd, null, { x11: true }).then((stream) => {
             this.__x11 = SSHUtils.createDeferredPromise();
             var code = 0;
             stream.on('end', (err?:any) => {
                 if (code !== 0) {
-                    this.__x11.reject("X11 forwading not enabled on server");
+                    this.__x11.promise.reject("X11 forwading not enabled on server");
                     this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X11 forwading not enabled on server"});
                 }
             }).on('exit', (exitcode:number) => {
@@ -191,7 +191,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close SSH Connection
      */
-    close() {
+    close(): Promise<any> {
         this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT);
         return this.closeTunnel().then(() => {
             if (this.sshConnection){
@@ -204,7 +204,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Connect the SSH Connection
      */
-    connect(c?:any) {
+    connect(c?:any): Promise<any> {
         this.config = Object.assign(this.config, c);
         ++this.__retries;
 
@@ -294,7 +294,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Add new tunnel if not exist
      */
-    addTunnel(tunnelConfig: TunnelConfig) {
+    addTunnel(tunnelConfig: TunnelConfig): Promise<any> {
         tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
         this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.BEFORECONNECT, {tunnelConfig: tunnelConfig});
         if (this.getTunnel(tunnelConfig.name)) {
@@ -363,7 +363,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close the tunnel
      */
-    closeTunnel(name?:string) {
+    closeTunnel(name?:string): Promise<any> {
         return new Promise((resolve, reject) => {
             if (name && this.activeTunnels[name]) {
                 var tunnel = this.activeTunnels[name];

@@ -78,7 +78,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Array<any>>`
      */
-    readFileData(filename: String, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>> {
+    readFileData(filename: string, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>> {
         return Promise.reject(false);
     }
 
@@ -86,9 +86,9 @@ export default abstract class BaseSFTP extends EventEmitter {
      * (Client-only)
      *  Reads file content at given path. Default encoding is null.
      *
-     * Returns `Promise<String>`
+     * Returns `Promise<string>`
      */
-    readFile(filename: String, encoding?: String|any): Promise<String> {
+    readFile(filename: string, encoding?: string|any): Promise<string> {
         return Promise.reject(false);
     }
 
@@ -108,7 +108,7 @@ export default abstract class BaseSFTP extends EventEmitter {
     * 
     * Returns `Promise<void>`
     */
-    writeFileData(filename: String, buffer: Buffer, offset: number, length: number, position: number): Promise<void> {
+    writeFileData(filename: string, buffer: Buffer, offset: number, length: number, position: number): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -117,7 +117,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      * 
      * Returns `Promise<void>`
      */
-    writeFile(filename: String, data: String, options: any): Promise<void> {
+    writeFile(filename: string, data: string, options: any): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -137,7 +137,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Stats>`
      */
-    getStat(filename: String): Promise<Stats> {
+    getStat(filename: string): Promise<Stats> {
         return Promise.reject(false);
     }
 
@@ -157,7 +157,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    setStat(filename: String, attributes: InputAttributes): Promise<void> {
+    setStat(filename: string, attributes: InputAttributes): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -177,7 +177,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeTimestamp(filename: String, atime: number | Date, mtime: number | Date): Promise<void> {
+    changeTimestamp(filename: string, atime: number | Date, mtime: number | Date): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -197,7 +197,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeOwner(filename: String, uid: number, gid: number): Promise<void> {
+    changeOwner(filename: string, uid: number, gid: number): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -217,7 +217,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<void>`
      */
-    changeMode(filename: String,  mode: number | string): Promise<void> {
+    changeMode(filename: string,  mode: number | string): Promise<void> {
         return Promise.reject(false);
     }
 
@@ -345,9 +345,9 @@ export default abstract class BaseSFTP extends EventEmitter {
     * (Client-only)
     * Retrieves the target for a symlink at `path`.
     *
-    * Returns `Promise<String>`
+    * Returns `Promise<string>`
     */
-    readlink(path: string): Promise<String> {
+    readlink(path: string): Promise<string> {
         return Promise.reject(false);
     }
     /**
@@ -364,9 +364,9 @@ export default abstract class BaseSFTP extends EventEmitter {
      * (Client-only)
      * Resolves `path` to an absolute path.
      *
-     * Returns `Promise<String>`
+     * Returns `Promise<string>`
      */
-    realpath(path: string): Promise<String> {
+    realpath(path: string): Promise<string> {
         return Promise.reject(false);
     }
 

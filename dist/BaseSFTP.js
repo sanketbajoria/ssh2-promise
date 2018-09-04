@@ -60,6 +60,15 @@ class BaseSFTP extends events_1.EventEmitter {
         return Promise.reject(false);
     }
     /**
+     * (Client-only)
+     *  Reads file content at given path. Default encoding is null.
+     *
+     * Returns `Promise<string>`
+     */
+    readFile(filename, encoding) {
+        return Promise.reject(false);
+    }
+    /**
     * (Client-only)
     * Writes length bytes from buffer starting at offset to the resource associated with file starting at position.
     *
@@ -75,6 +84,14 @@ class BaseSFTP extends events_1.EventEmitter {
     * Returns `Promise<void>`
     */
     writeFileData(filename, buffer, offset, length, position) {
+        return Promise.reject(false);
+    }
+    /**
+     *  Writes data at given path. options can have two properties encoding and flag, Default encoding is utf8, and flag is w.
+     *
+     * Returns `Promise<void>`
+     */
+    writeFile(filename, data, options) {
         return Promise.reject(false);
     }
     /**
@@ -280,7 +297,7 @@ class BaseSFTP extends events_1.EventEmitter {
     * (Client-only)
     * Retrieves the target for a symlink at `path`.
     *
-    * Returns `Promise<String>`
+    * Returns `Promise<string>`
     */
     readlink(path) {
         return Promise.reject(false);
@@ -298,7 +315,7 @@ class BaseSFTP extends events_1.EventEmitter {
      * (Client-only)
      * Resolves `path` to an absolute path.
      *
-     * Returns `Promise<String>`
+     * Returns `Promise<string>`
      */
     realpath(path) {
         return Promise.reject(false);
