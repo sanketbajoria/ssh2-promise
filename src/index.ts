@@ -100,7 +100,7 @@ class SSH2Promise extends EventEmitter {
     deregister: Array<any>;
     disableCache: boolean;
 
-    constructor(options: any, disableCache: boolean) {
+    constructor(options: any, disableCache?: boolean) {
         super();
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o: any) => {
@@ -109,7 +109,7 @@ class SSH2Promise extends EventEmitter {
             return o;
         });
         this.deregister = [];
-        this.disableCache = disableCache;
+        this.disableCache = disableCache || false;
         methods.forEach((m: string) => {
             (this as any)[m] = function () {
                 var params = arguments;

@@ -146,7 +146,7 @@ class SSHConnection extends events_1.EventEmitter {
             var code = 0;
             stream.on('end', (err) => {
                 if (code !== 0) {
-                    this.__x11.reject("X11 forwading not enabled on server");
+                    this.__x11.promise.reject("X11 forwading not enabled on server");
                     this.emit(sshConstants_1.default.CHANNEL.X11, sshConstants_1.default.STATUS.DISCONNECT, { err: err, msg: "X11 forwading not enabled on server" });
                 }
             }).on('exit', (exitcode) => {
@@ -258,7 +258,9 @@ class SSHConnection extends events_1.EventEmitter {
      */
     addTunnel(tunnelConfig) {
         tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
+        this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.BEFORECONNECT, { tunnelConfig: tunnelConfig });
         if (this.getTunnel(tunnelConfig.name)) {
+            this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.CONNECT, { tunnelConfig: tunnelConfig });
             return Promise.resolve(this.getTunnel(tunnelConfig.name));
         }
         else {
@@ -311,7 +313,7 @@ class SSHConnection extends events_1.EventEmitter {
                     this.emit(sshConstants_1.default.CHANNEL.TUNNEL, sshConstants_1.default.STATUS.DISCONNECT, { tunnelConfig: tunnelConfig, err: err });
                     server.close();
                     reject(err);
-                    delete this.activeTunnels[name];
+                    delete this.activeTunnels[tunnelConfig.name];
                 }).listen(tunnelConfig.localPort);
             });
         }

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const events_1 = require("events");
 const sshConstants_1 = require("./sshConstants");
+const BaseSFTP_1 = require("./BaseSFTP");
 var stringFlagMap = ['r', 'r+', 'w', 'wx', 'xw', 'w+', 'wx+', 'xw+', 'a', 'ax', 'xa', 'a+', 'ax+', 'xa+'];
-var methods = ["fastGet", "fastPut", "open", "close", "readFile", "writeFile", "read", "write", "fstat", "fsetstat", "futimes", "fchown", "fchmod", "opendir", "readdir", "unlink", "rename", "mkdir", "rmdir", "stat", "lstat", "setstat", "utimes", "chown", "chmod", "readlink", "symlink", "realpath", "ext_openssh_rename", "ext_openssh_statvfs", "ext_openssh_fstatvfs", "ext_openssh_hardlink", "ext_openssh_fsync"];
-var enhanceMethods = { "readData": "read", "writeData": "write", "getStat": "fstat", "setStat": "fsetstat", "changeTimestamp": "futimes", "changeOwner": "fchown", "changeMode": "fchmod" };
-class SFTP extends events_1.EventEmitter {
+var methods = ["fastGet", "fastPut", "open", "close", "readFile", "writeFile", "readData", "writeData", "fstat", "fsetstat", "futimes", "fchown", "fchmod", "opendir", "readdir", "unlink", "rename", "mkdir", "rmdir", "stat", "lstat", "setstat", "utimes", "chown", "chmod", "readlink", "symlink", "realpath", "ext_openssh_rename", "ext_openssh_statvfs", "ext_openssh_fstatvfs", "ext_openssh_hardlink", "ext_openssh_fsync"];
+var enhanceMethods = { "readFileData": "readData", "writeFileData": "writeData", "getStat": "fstat", "setStat": "fsetstat", "changeTimestamp": "futimes", "changeOwner": "fchown", "changeMode": "fchmod" };
+class SFTP extends BaseSFTP_1.default {
     constructor(ssh) {
         super();
         this.ssh = ssh;

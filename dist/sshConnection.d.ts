@@ -45,7 +45,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a Socks Port
      */
-    getSocksPort(localPort: number): Promise<any>;
+    getSocksPort(localPort: number): Promise<number>;
     /**
      * Get a X11 port
      */
@@ -53,7 +53,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close SSH Connection
      */
-    close(): Promise<void>;
+    close(): Promise<any>;
     /**
      * Connect the SSH Connection
      */
@@ -69,5 +69,5 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close the tunnel
      */
-    closeTunnel(name?: string): Promise<{}>;
+    closeTunnel(name?: string): Promise<any>;
 }

@@ -1,6 +1,7 @@
 var SSHTunnel = require("../dist/index");
 var SSHConstants = require("../dist/index").Constants;
 
+
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 Promise.prototype.finally = function (cb) {
     const res = () => this;
@@ -154,6 +155,52 @@ describe("connect to dummy server", function () {
     it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.multiple);
         var sshTunnel2 = new SSHTunnel(sshConfigs.multiple)
+        sshTunnel.connect().then((ssh) => {
+            expect(ssh).toBeDefined();
+            expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
+            Object.keys(SSHTunnel.__cache).forEach((k) => {
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(1);
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(1);
+                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(1);
+            });
+            return sshTunnel2.connect();
+        }, (error) => {
+            expect(error).toBeUndefined();
+        }).then((ssh) => {
+            expect(ssh).toBeDefined();
+            expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
+            Object.keys(SSHTunnel.__cache).forEach((k) => {
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(2);
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(2);
+                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(2);
+            });
+            return sshTunnel.close();
+        }, (error) => {
+            expect(error).toBeUndefined();
+        }).then(() => {
+            expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
+            Object.keys(SSHTunnel.__cache).forEach((k) => {
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(1);
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(1);
+                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(1);
+            });
+            return sshTunnel2.close();
+        }).finally(() => {
+            expect(Object.keys(SSHTunnel.__cache).length).toBe(0);
+            Object.keys(SSHTunnel.__cache).forEach((k) => {
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(0);
+                expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(0);
+                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(0);
+                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`)).toBe(0);
+            });
+            done();
+        });
+    }); 
+
+    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
+
+        var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
+        var sshTunnel2 = new SSHTunnel(sshConfigs.couchmultiple)
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
             expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
