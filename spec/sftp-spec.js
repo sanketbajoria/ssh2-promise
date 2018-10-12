@@ -29,6 +29,22 @@ describe("sftp cmd", function () {
                 done();
             }
         })();
+    }); 
+
+    it("fast put file", function (done) {
+        (async function(){
+            try{
+                await sftp.fastPut('C:\\test\\test1\\test2.log', "/home/ubuntu/test2.txt");
+                expect(1).toBe(1);
+                //var content = await sftp.readFile('/dummy', "utf8");
+                //expect(content).toBeNonEmptyString();
+            }catch(err){
+                console.log(err);
+                expect(1).toBe(0);
+            }finally{
+                done();
+            }
+        })();
     });
 
     it("read dir", function (done) {

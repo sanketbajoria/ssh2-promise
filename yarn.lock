@@ -1622,19 +1622,19 @@ sprintf@0.1.x:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/sprintf/-/sprintf-0.1.5.tgz#8f83e39a9317c1a502cb7db8050e51c679f6edcf"
 
-ssh2-streams@~0.1.18:
-  version "0.1.20"
-  resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.1.20.tgz#51118d154555df5469ee1f67e0cf1e7e8a2c0e3a"
+ssh2-streams@~0.2.0:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.2.1.tgz#9c9c9964be60e9644575af328677f64b1e5cbd79"
   dependencies:
     asn1 "~0.2.0"
     semver "^5.1.0"
     streamsearch "~0.1.2"
 
-ssh2@^0.5.5:
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-0.5.5.tgz#c7781ecd2ece7304a253cf620fab5a5c22bb2235"
+ssh2@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-0.6.1.tgz#5dde1a7394bb978b1f9c2f014affee2f5493bd40"
   dependencies:
-    ssh2-streams "~0.1.18"
+    ssh2-streams "~0.2.0"
 
 stack-trace@0.0.x:
   version "0.0.10"
