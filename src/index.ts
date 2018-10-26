@@ -105,7 +105,7 @@ class SSH2Promise extends EventEmitter {
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o: any) => {
             o = Object.assign({}, defaultOptions, o);
-            o.uniqueId = o.uniqueId || `${o.username}@${o.host}`;
+	    o.uniqueId = o.uniqueId || `${o.username}@${o.host}:${o.port}`;
             return o;
         });
         this.deregister = [];
