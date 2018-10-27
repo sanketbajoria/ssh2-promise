@@ -1,9 +1,9 @@
 "use strict";
-const events_1 = require("events");
 const sshConnection_1 = require("./sshConnection");
 const sshConstants_1 = require("./sshConstants");
 const sshUtils_1 = require("./sshUtils");
 const sftp_1 = require("./sftp");
+const BaseSSH2Promise_1 = require("./BaseSSH2Promise");
 function isRegistered(sshConnection, sshTunnel) {
     return sshTunnel.deregister.filter((i) => {
         return i.sshConnection.config.uniqueId === sshConnection.config.uniqueId;
@@ -74,13 +74,13 @@ var defaultOptions = {
     reconnectTries: 10,
     reconnectDelay: 5000
 };
-class SSH2Promise extends events_1.EventEmitter {
+class SSH2Promise extends BaseSSH2Promise_1.default {
     constructor(options, disableCache) {
         super();
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o) => {
             o = Object.assign({}, defaultOptions, o);
-            o.uniqueId = o.uniqueId || `${o.username}@${o.host}`;
+            o.uniqueId = o.uniqueId || `${o.username}@${o.host}:${o.port}`;
             return o;
         });
         this.deregister = [];

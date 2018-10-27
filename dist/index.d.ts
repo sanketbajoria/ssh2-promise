@@ -1,8 +1,7 @@
-/// <reference types="node" />
-import { EventEmitter } from "events";
 import SSHConnection from './sshConnection';
 import SFTP from './sftp';
-declare class SSH2Promise extends EventEmitter {
+import BaseSSH2Promise from './BaseSSH2Promise';
+declare class SSH2Promise extends BaseSSH2Promise {
     /**
  * For caching SSH Connection
  */

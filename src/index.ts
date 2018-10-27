@@ -3,6 +3,7 @@ import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SFTP from './sftp';
+import BaseSSH2Promise from './BaseSSH2Promise';
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -83,7 +84,7 @@ var defaultOptions = {
 };
 
 
-class SSH2Promise extends EventEmitter {
+class SSH2Promise extends BaseSSH2Promise {
 
     /**
  * For caching SSH Connection
