@@ -1,6 +1,5 @@
-var SSHTunnel = require("../dist/index");
+import SSHTunnel = require('../dist/index')
 var SSHConstants = require("../dist/index").Constants;
-
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 /* Promise.prototype["finally"] = function (cb) {
@@ -16,6 +15,7 @@ describe("connect to dummy server", function () {
     it("should connect directly to server with password", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.singleWithPassword);
         var sftp = new SSHTunnel.SFTP(sshTunnel);
+
         sshTunnel.connect().then((ssh: any) => {
             expect(ssh).toBeDefined();
             sshTunnel.close();
