@@ -13,7 +13,7 @@ describe("sftp cmd", function () {
     var sshTunnel;
     beforeAll(() => {
         sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
-        sftp = new SSHTunnel.SFTP(sshTunnel);
+        sftp = sshTunnel.sftp();//new SSHTunnel.SFTP(sshTunnel);//sshTunnel.sftp()
     });
 
    it("read/write file", function (done) {
@@ -134,7 +134,7 @@ describe("sftp cmd", function () {
             done();
         });
     });
-
+   
     afterAll(() => {
         sshTunnel.close()
     })

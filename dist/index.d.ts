@@ -32,11 +32,15 @@ declare class SSH2Promise extends BaseSSH2Promise {
             CONTINUE: string;
         };
     };
-    sftp: () => Promise<any>;
+    rawSFTP: () => Promise<any>;
     config: any;
     deregister: Array<any>;
     disableCache: boolean;
     constructor(options: any, disableCache?: boolean);
+    /**
+     * Get SFTP session, with promise and async/await
+     */
+    sftp(): SFTP;
     emit(event: string | symbol, ...args: any[]): boolean;
     /**
      * Get SSH if existing from cache otherwise create new one

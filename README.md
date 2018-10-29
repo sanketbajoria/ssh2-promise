@@ -4,6 +4,8 @@
 It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too. It can handle 'continue' event automatically, While doing any sftp operation.
 This module is written in `Typescript`. It can be used in `Javascript` or in `Typescript` with full type support.
 
+<p style="color:red"><b><i>Change in sftp api, now ssh.sftp() provide wrapped SFTP session instead of raw sftp session.</i></i></p>
+
 # Installation
 
 ```javascript
@@ -130,13 +132,14 @@ ssh.spawn("tail -f /var/log.txt").then((socket) => {
 var ssh = new SSH2Promise(sshconfig);
 
 //Promise
-//Get a raw sftp session, please don't use raw sftp session, instead use SFTP Promise wrapper defined below example.
+//Get a sftp session
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
-ssh.sftp().then((sftp) => {
-  sftp.readdir("/", (err, data) => {
-    console.log(data); //file listing
-  })
-});
+
+var sftp = ssh.sftp()
+sftp.readdir("/").then((data) => {
+  console.log(data); //file listing
+})
+
 
 //Get a shell session
 ssh.shell().then((socket) => {
@@ -149,13 +152,12 @@ ssh.shell().then((socket) => {
 
 
 //Async Await
-//Get a raw sftp session, please don't use raw sftp session, instead use SFTP Promise wrapper defined below example.
+//Get a sftp session
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 (async function(){
-    var sftp = await ssh.sftp();
-    sftp.readdir("/", (err, data) => {
-      console.log(data); //file listing
-    });
+    var sftp = ssh.sftp();
+    var data = await sftp.readdir("/")
+    console.log(data); //file listing
 })();
 
 //Get a shell session
@@ -173,7 +175,7 @@ ssh.shell().then((socket) => {
 
 ```javascript
 var ssh = new SSH2Promise(sshconfig);
-var sftp = new SSH2Promise.SFTP(ssh);
+var sftp = ssh.sftp(); //or new SSH2Promise.SFTP(ssh);
 
 //We can do all sftp client operation listed in "https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md" in promisify or async await manner.
 
@@ -378,7 +380,7 @@ ssh.subsys('sftp').then((stream) => {
 
 * **spawn**(< _string_ >cmd, < _array_ >params, < _objects_ >options) - _(Promise)_ - Spawn a cmd, return a stream. Options are passed directly to ssh2 exec command.
 
-* **sftp**([< _(Promise)_ >createNew]) - _(Promise)_ - Get a new sftp session, if establishing sftp session for first time or createNew flag is true. 
+* **sftp**() - _(SFTP)_ - Get a new sftp session. 
 
 * **subsys**(< _string_ >subsystem) - _(Promise)_ - Invoke a subsystem.
 

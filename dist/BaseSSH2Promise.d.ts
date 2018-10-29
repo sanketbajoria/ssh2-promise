@@ -17,13 +17,9 @@ export default abstract class BaseSSH2Promise extends EventEmitter {
      */
     spawn(cmd: string, params?: Array<string>, options?: any): Promise<any>;
     /**
-     * Get a raw sftp session
-     * @param createNew
-     */
-    /**
      * Get shell socket
      */
-    shell(options: any): Promise<any>;
+    shell(options?: any): Promise<any>;
     /**
     * Get a subsys
     */

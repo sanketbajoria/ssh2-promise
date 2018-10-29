@@ -25,17 +25,9 @@ export default abstract class BaseSSH2Promise extends EventEmitter {
     }
 
     /**
-     * Get a raw sftp session
-     * @param createNew 
-     */
-    /* sftp(): Promise<any> {
-        return Promise.reject();
-    } */
-
-    /**
      * Get shell socket
      */
-    shell(options:any): Promise<any> {
+    shell(options?:any): Promise<any> {
         return Promise.reject();
     }
 

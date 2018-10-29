@@ -21,13 +21,6 @@ class BaseSSH2Promise extends events_1.EventEmitter {
         return Promise.reject();
     }
     /**
-     * Get a raw sftp session
-     * @param createNew
-     */
-    /* sftp(): Promise<any> {
-        return Promise.reject();
-    } */
-    /**
      * Get shell socket
      */
     shell(options) {

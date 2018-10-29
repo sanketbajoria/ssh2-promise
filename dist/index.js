@@ -67,7 +67,7 @@ function register(sshConnection, sshTunnel, isLast) {
         }
     };
 }
-var methods = ['exec', 'spawn', 'sftp', 'shell', 'subsys', 'x11', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel'];
+var methods = ['exec', 'spawn', { 'rawSFTP': 'sftp' }, 'shell', 'subsys', 'x11', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel'];
 var defaultOptions = {
     reconnect: true,
     port: 22,
@@ -86,13 +86,20 @@ class SSH2Promise extends BaseSSH2Promise_1.default {
         this.deregister = [];
         this.disableCache = disableCache || false;
         methods.forEach((m) => {
-            this[m] = function () {
+            var k = typeof m == "string" ? m : Object.keys(m)[0];
+            this[k] = function () {
                 var params = arguments;
                 return this.connect().then((sshConnection) => {
-                    return sshConnection[m].apply(sshConnection, params);
+                    return sshConnection[typeof m == "string" ? m : m[k]].apply(sshConnection, params);
                 });
             }.bind(this);
         });
+    }
+    /**
+     * Get SFTP session, with promise and async/await
+     */
+    sftp() {
+        return new sftp_1.default(this);
     }
     emit(event, ...args) {
         var config = sshUtils_1.default.peek(this.config);
