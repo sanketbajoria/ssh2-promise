@@ -3,6 +3,7 @@ import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SFTP from './sftp';
+import BaseSSH2Promise from './BaseSSH2Promise';
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -10,7 +11,7 @@ function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     }).length > 0;
 }
 
-function register(sshConnection:SSHConnection, sshTunnel:SSH2Promise, isLast:boolean) {
+function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: boolean) {
     var events = [SSHConstants.CHANNEL.SSH, SSHConstants.CHANNEL.TUNNEL];
     sshConnection.__sshTunnels = sshConnection.__sshTunnels || [];
     sshConnection.__sshTunnels.push(sshTunnel);
@@ -73,7 +74,7 @@ function register(sshConnection:SSHConnection, sshTunnel:SSH2Promise, isLast:boo
     }
 }
 
-var methods = ['exec', 'spawn', 'sftp', 'shell', 'subsys', 'x11', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel']
+var methods = ['exec', 'spawn', {'rawSFTP':'sftp'}, 'shell', 'subsys', 'x11', 'getSocksPort', 'getTunnel', 'addTunnel', 'closeTunnel']
 
 var defaultOptions = {
     reconnect: true,
@@ -83,19 +84,18 @@ var defaultOptions = {
 };
 
 
-class SSH2Promise extends EventEmitter {
+class SSH2Promise extends BaseSSH2Promise {
 
     /**
  * For caching SSH Connection
  */
-    static __cache:any = {};
+    static __cache: any = {};
     static SSH = SSHConnection;
     static Utils = SSHUtils;
     static SFTP = SFTP;
     static Constants = SSHConstants;
 
-    sftp: () => Promise<any>;
-
+    rawSFTP: () => Promise<any>;
     config: any;
     deregister: Array<any>;
     disableCache: boolean;
@@ -105,22 +105,30 @@ class SSH2Promise extends EventEmitter {
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o: any) => {
             o = Object.assign({}, defaultOptions, o);
-	    o.uniqueId = o.uniqueId || `${o.username}@${o.host}:${o.port}`;
+            o.uniqueId = o.uniqueId || `${o.username}@${o.host}:${o.port}`;
             return o;
         });
         this.deregister = [];
         this.disableCache = disableCache || false;
-        methods.forEach((m: string) => {
-            (this as any)[m] = function () {
+        methods.forEach((m: any) => {
+            var k = typeof m == "string"?m:Object.keys(m)[0];
+            (this as any)[k] = function () {
                 var params = arguments;
                 return this.connect().then((sshConnection: SSHConnection) => {
-                    return sshConnection[m].apply(sshConnection, params);
+                    return sshConnection[typeof m == "string"?m:m[k]].apply(sshConnection, params);
                 });
             }.bind(this);
         });
     }
 
-    emit(event: string | symbol, ...args: any[]):boolean {
+    /**
+     * Get SFTP session, with promise and async/await
+     */
+    sftp(): SFTP {
+        return new SFTP(this);
+    }
+
+    emit(event: string | symbol, ...args: any[]): boolean {
         var config = SSHUtils.peek(this.config);
         if (config.debug) {
             config.debug(arguments);

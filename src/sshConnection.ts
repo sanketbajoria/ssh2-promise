@@ -62,7 +62,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get shell socket
      */
-    shell(options:any): Promise<any> {
+    shell(options?:any): Promise<any> {
         options = options || {};
         return this.connect().then(() => {
             return new Promise((resolve, reject) => {

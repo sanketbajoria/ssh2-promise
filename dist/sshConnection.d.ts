@@ -25,7 +25,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get shell socket
      */
-    shell(options: any): Promise<any>;
+    shell(options?: any): Promise<any>;
     /**
      * Get a sftp session
      */

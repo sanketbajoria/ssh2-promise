@@ -28,7 +28,7 @@ class SFTP extends BaseSFTP_1.default {
                     });
                     var recur = () => {
                         $ready.then(() => {
-                            return this.ssh.sftp();
+                            return this.ssh.rawSFTP();
                         }).then((sftp) => {
                             var executed = sftp[m].apply(sftp, params);
                             if (executed === false) {
@@ -71,13 +71,13 @@ class SFTP extends BaseSFTP_1.default {
     }
     createReadStream() {
         var params = [...arguments];
-        return this.ssh.sftp().then((sftp) => {
+        return this.ssh.rawSFTP().then((sftp) => {
             return sftp.createReadStream.apply(sftp, params);
         });
     }
     createWriteStream() {
         var params = [...arguments];
-        return this.ssh.sftp().then((sftp) => {
+        return this.ssh.rawSFTP().then((sftp) => {
             return sftp.createWriteStream.apply(sftp, params);
         });
     }

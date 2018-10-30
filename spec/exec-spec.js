@@ -25,7 +25,7 @@ describe("exec n spawn cmd", function () {
     });
 
     it("open sftp session", function (done) {
-        sshTunnel.sftp().then((sftp) => {
+        sshTunnel.rawSFTP().then((sftp) => {
             expect(sftp).toBeDefined();
             expect(sftp.readdir).toBeDefined();
         }, (error) => {
