@@ -264,20 +264,19 @@ export default class SSHConnection extends EventEmitter {
             }).on('error', (err:any) => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
                 this.__err = err;
-                reject(err);
-                this.__$connectPromise = null;
+                //reject(err);
+                //this.__$connectPromise = null;
             }).on('continue', () => {
                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE); 
             }).on('close', () => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: this.__err});
-                reject(this.__err);
-                this.__$connectPromise = null;
-                if (this.__err != null && this.__err.level != "client-authentication" && this.__err.code != 'ENOTFOUND') {
-                    if (this.config.reconnect && this.__retries <= this.config.reconnectTries) {
-                        setTimeout(() => {
-                            this.connect();
-                        }, this.config.reconnectDelay);
-                    }
+                if (this.config.reconnect && this.__retries <= this.config.reconnectTries && this.__err != null && this.__err.level != "client-authentication" && this.__err.code != 'ENOTFOUND') {
+                    setTimeout(() => {
+                        this.__$connectPromise = null;
+                        resolve(this.connect());
+                    }, this.config.reconnectDelay);
+                }else{
+                    reject(this.__err);
                 }
             }).connect(this.config);
         });

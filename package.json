@@ -1,6 +1,6 @@
 {
   "name": "ssh2-promise",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Promise wrapper around SSH2 library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

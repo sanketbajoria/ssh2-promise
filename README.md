@@ -138,6 +138,8 @@ var ssh = new SSH2Promise(sshconfig);
 var sftp = ssh.sftp()
 sftp.readdir("/").then((data) => {
   console.log(data); //file listing
+}).catch((err) => {
+  console.log(err);
 })
 
 
