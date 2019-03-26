@@ -1,6 +1,7 @@
 import SSHConstants from './sshConstants';
 import SSH2Promise = require('./index');
 import BaseSFTP from './BaseSFTP';
+import { ReadStreamOptions, WriteStreamOptions } from 'ssh2-streams';
 
 var stringFlagMap = ['r', 'r+', 'w', 'wx', 'xw', 'w+', 'wx+', 'xw+', 'a', 'ax', 'xa', 'a+', 'ax+', 'xa+'];
 
@@ -76,14 +77,14 @@ export default class SFTP extends BaseSFTP {
         });
     }
 
-    createReadStream() {
+    createReadStream(path: string, options?: ReadStreamOptions) {
         var params = [...arguments];
         return this.ssh.rawSFTP().then((sftp:any) => {
             return sftp.createReadStream.apply(sftp, params);
         });
     }
 
-    createWriteStream() {
+    createWriteStream(path: string, options?: WriteStreamOptions) {
         var params = [...arguments];
         return this.ssh.rawSFTP().then((sftp:any) => {
             return sftp.createWriteStream.apply(sftp, params);

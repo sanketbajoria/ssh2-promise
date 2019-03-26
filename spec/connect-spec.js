@@ -14,7 +14,7 @@ var util = require('util');
 
 
 describe("connect to dummy server", function () {
-    it("should connect directly to server with password", function (done) {
+    /* it("should connect directly to server with password", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.singleWithPassword);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
@@ -241,6 +241,19 @@ describe("connect to dummy server", function () {
             });
             done();
         });
+    }); */
+
+    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
+
+        var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
+        sshTunnel.on("ssh:beforeconnect", (sshConnection, payload) => {
+            console.log("adsf");
+        })
+        sshTunnel.connect().then((ssh) => {
+
+        }).finally(() => {
+            console.log("finish")
+        })
     });
 
 

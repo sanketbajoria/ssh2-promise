@@ -69,13 +69,13 @@ class SFTP extends BaseSFTP_1.default {
             };
         });
     }
-    createReadStream() {
+    createReadStream(path, options) {
         var params = [...arguments];
         return this.ssh.rawSFTP().then((sftp) => {
             return sftp.createReadStream.apply(sftp, params);
         });
     }
-    createWriteStream() {
+    createWriteStream(path, options) {
         var params = [...arguments];
         return this.ssh.rawSFTP().then((sftp) => {
             return sftp.createWriteStream.apply(sftp, params);
