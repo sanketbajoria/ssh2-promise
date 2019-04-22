@@ -1,5 +1,5 @@
 import SSHConstants from './sshConstants';
-import SSH2Promise = require('./index');
+import { SSH2Promise } from './index';
 import BaseSFTP from './BaseSFTP';
 import { ReadStreamOptions, WriteStreamOptions } from 'ssh2-streams';
 

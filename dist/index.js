@@ -1,7 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const sshConnection_1 = require("./sshConnection");
 const sshConstants_1 = require("./sshConstants");
+exports.SSHConstants = sshConstants_1.default;
 const sshUtils_1 = require("./sshUtils");
+exports.SSHUtils = sshUtils_1.default;
 const sftp_1 = require("./sftp");
 const BaseSSH2Promise_1 = require("./BaseSSH2Promise");
 function isRegistered(sshConnection, sshTunnel) {
@@ -20,7 +31,7 @@ function register(sshConnection, sshTunnel, isLast) {
         sshConnection.on(event, cb);
         return cb;
     });
-    var disconnectEvent = `${sshConstants_1.default.CHANNEL.SSH}:${sshConstants_1.default.STATUS.DISCONNECT}`;
+    var disconnectEvent = `${sshConstants_1.default.CHANNEL.SSH}:${sshConstants_1.default.STATUS.BEFOREDISCONNECT}`;
     var disconnectCb = () => {
         var del;
         for (var i = 0; i < sshTunnel.config.length; i++) {
@@ -58,6 +69,7 @@ function register(sshConnection, sshTunnel, isLast) {
                 Promise.resolve();
             }
             else {
+                sshTunnel.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.BEFOREDISCONNECT, sshConnection);
                 return sshConnection.close().then(() => {
                     events.forEach((event, idx) => {
                         sshConnection.removeListener(event, cbs[idx]);
@@ -106,6 +118,7 @@ class SSH2Promise extends BaseSSH2Promise_1.default {
         if (config.debug) {
             config.debug(arguments);
         }
+        super.emit.apply(this, [`${arguments[0]}:${arguments[1]}`].concat(Array.prototype.slice.call(arguments, 2)));
         return super.emit.apply(this, arguments);
     }
     /**
@@ -127,7 +140,7 @@ class SSH2Promise extends BaseSSH2Promise_1.default {
             this.deregister.push(register(ret, this, isLast));
         }
         return ret.connect().then((ssh) => {
-            ssh.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.CONNECT);
+            // ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
             return ssh;
         });
     }
@@ -158,15 +171,25 @@ class SSH2Promise extends BaseSSH2Promise_1.default {
      * Close SSH Connection
      */
     close() {
-        return Promise.all(this.deregister.map(f => f.close()));
+        return new Promise((resolve, reject) => {
+            (() => __awaiter(this, void 0, void 0, function* () {
+                for (const f of this.deregister.reverse()) {
+                    try {
+                        yield f.close();
+                    }
+                    catch (err) {
+                        reject(err);
+                    }
+                }
+                resolve();
+            }))();
+        });
+        // this.deregister.reverse().forEach()
+        // return Promise.all(this.deregister.reverse().map(async f => await f.close()));
     }
 }
 /**
 * For caching SSH Connection
 */
 SSH2Promise.__cache = {};
-SSH2Promise.SSH = sshConnection_1.default;
-SSH2Promise.Utils = sshUtils_1.default;
-SSH2Promise.SFTP = sftp_1.default;
-SSH2Promise.Constants = sshConstants_1.default;
-module.exports = SSH2Promise;
+exports.SSH2Promise = SSH2Promise;

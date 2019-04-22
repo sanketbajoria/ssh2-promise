@@ -1,6 +1,6 @@
-import SSHTunnel = require('../dist/index')
-var SSHConstants = require("../dist/index").Constants
-var SFTP = require("../dist/index").SFTP
+import { SSH2Promise } from '../dist/index'
+import { SSHConstants } from "../dist/index"
+
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 /* Promise.prototype["finally"] = function (cb) {
@@ -14,7 +14,7 @@ var util = require('util');
 
 describe("connect to dummy server", function () {
     it("should connect directly to server with password", function (done) {
-        var sshTunnel = new SSHTunnel(sshConfigs.singleWithPassword);
+        var sshTunnel = new SSH2Promise(sshConfigs.singleWithPassword);
         
         sshTunnel.connect().then((ssh: any) => {
             expect(ssh).toBeDefined();
@@ -29,7 +29,7 @@ describe("connect to dummy server", function () {
     });
 
     it("read stream", function (done) {
-        var sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
+        var sshTunnel = new SSH2Promise(sshConfigs.singleWithKey);
         sshTunnel.sftp().createReadStream("/home/ubuntu/abc").then((stream) => {
             expect(stream).toBeDefined();
             var buffer = "";

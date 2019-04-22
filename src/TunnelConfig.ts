@@ -1,4 +1,4 @@
-export interface TunnelConfig {
+export default interface TunnelConfig {
     remoteAddr?: string;
     localPort?: number;
     remotePort?: number;

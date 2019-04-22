@@ -3,9 +3,9 @@ import * as net from 'net';
 import * as fs from 'fs';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
-import SSH2Promise = require('./index');
+import { SSH2Promise } from './index';
 import { Stream } from 'stream';
-import { TunnelConfig } from './TunnelConfig';
+import TunnelConfig from './TunnelConfig';
 
 const SSH2 = require('ssh2'),
     socks = require('socksv5');
@@ -192,7 +192,7 @@ export default class SSHConnection extends EventEmitter {
      * Close SSH Connection
      */
     close(): Promise<any> {
-        this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT);
+        //this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT);
         return this.closeTunnel().then(() => {
             if (this.sshConnection){
                 this.sshConnection.end();
@@ -208,10 +208,18 @@ export default class SSHConnection extends EventEmitter {
         this.config = Object.assign(this.config, c);
         ++this.__retries;
 
-        if (this.__$connectPromise != null)
+        if (this.__$connectPromise != null){
+            if(!this.config.initialized){
+                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFORECONNECT);
+                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
+                this.config.initialized = true;
+            }
             return this.__$connectPromise;
+        }
+            
 
         this.__$connectPromise = new Promise((resolve, reject) => {
+            this.config.initialized = true;
             this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFORECONNECT);
             if (!this.config || typeof this.config === 'function' || !this.config.host || !this.config.username) {
                 reject("Invalid SSH connection configuration host/username can't be empty");
@@ -240,7 +248,7 @@ export default class SSHConnection extends EventEmitter {
                 });
             }).on('ready', (err:any) => {
                 if (err) {
-                    this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, { err: err });
+                    this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT, { err: err });
                     this.__$connectPromise = null;
                     return reject(err);
                 }
@@ -262,14 +270,14 @@ export default class SSHConnection extends EventEmitter {
                 // connects to localhost:0.0 
                 xserversock.connect(6000, 'localhost');
             }).on('error', (err:any) => {
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
+                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT, {err: err});
                 this.__err = err;
                 //reject(err);
                 //this.__$connectPromise = null;
             }).on('continue', () => {
                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE); 
             }).on('close', () => {
-                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: this.__err});
+                this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT, {err: this.__err});
                 if (this.config.reconnect && this.__retries <= this.config.reconnectTries && this.__err != null && this.__err.level != "client-authentication" && this.__err.code != 'ENOTFOUND') {
                     setTimeout(() => {
                         this.__$connectPromise = null;

@@ -1,9 +1,9 @@
-import { EventEmitter } from "events";
 import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SFTP from './sftp';
 import BaseSSH2Promise from './BaseSSH2Promise';
+import TunnelConfig from './TunnelConfig';
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -25,7 +25,7 @@ function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: 
     });
 
 
-    var disconnectEvent = `${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`;
+    var disconnectEvent = `${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.BEFOREDISCONNECT}`;
     var disconnectCb = () => {
         var del;
         for (var i = 0; i < sshTunnel.config.length; i++) {
@@ -64,6 +64,7 @@ function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: 
                 });
                 Promise.resolve();
             } else {
+                sshTunnel.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT, sshConnection);
                 return sshConnection.close().then(() => {
                     events.forEach((event, idx) => {
                         sshConnection.removeListener(event, cbs[idx]);
@@ -90,11 +91,6 @@ class SSH2Promise extends BaseSSH2Promise {
  * For caching SSH Connection
  */
     static __cache: any = {};
-    static SSH = SSHConnection;
-    static Utils = SSHUtils;
-    static SFTP = SFTP;
-    static Constants = SSHConstants;
-
     rawSFTP: () => Promise<any>;
     config: any;
     deregister: Array<any>;
@@ -133,6 +129,7 @@ class SSH2Promise extends BaseSSH2Promise {
         if (config.debug) {
             config.debug(arguments);
         }
+        super.emit.apply(this, [`${arguments[0]}:${arguments[1]}`].concat(Array.prototype.slice.call(arguments, 2)))
         return super.emit.apply(this, arguments);
     }
 
@@ -154,7 +151,7 @@ class SSH2Promise extends BaseSSH2Promise {
             this.deregister.push(register(ret, this, isLast));
         }
         return ret.connect().then((ssh: SSHConnection) => {
-            ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
+           // ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
             return ssh;
         });
     }
@@ -186,9 +183,23 @@ class SSH2Promise extends BaseSSH2Promise {
      * Close SSH Connection
      */
     close() {
-        return Promise.all(this.deregister.map(f => f.close()));
+        return new Promise((resolve, reject) => {
+            (async () => {
+                for(const f of this.deregister.reverse()){
+                    try{
+                        await f.close();
+                    }catch(err){
+                        reject(err)
+                    }
+                }
+                resolve();
+            })()
+        })
+        
+        // this.deregister.reverse().forEach()
+        // return Promise.all(this.deregister.reverse().map(async f => await f.close()));
     }
 
 }
 
-export = SSH2Promise;
+export {SSH2Promise, SSHUtils, SSHConstants, TunnelConfig};

@@ -1,5 +1,5 @@
-var SSHTunnel = require("../dist/index");
-var SSHConstants = require("../dist/index").Constants;
+var SSHTunnel = require("../dist/index").SSH2Promise;
+var SSHConstants = require("../dist/index").SSHConstants;
 
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
@@ -14,7 +14,7 @@ var util = require('util');
 
 
 describe("connect to dummy server", function () {
-    /* it("should connect directly to server with password", function (done) {
+     it("should connect directly to server with password", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.singleWithPassword);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
@@ -22,12 +22,13 @@ describe("connect to dummy server", function () {
             expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
-            sshTunnel.close();
+            return sshTunnel.close();
+        }).then(() => {
             done();
         });
     });
 
-    it("should connect directly to server with key", function (done) {
+    /* it("should connect directly to server with key", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
@@ -38,7 +39,7 @@ describe("connect to dummy server", function () {
             sshTunnel.close();
             done();
         });
-    });
+    });  */
 
     it("should not connect directly to server, with no password/pem", function (done) {
         var c = Object.assign({}, sshConfigs.singleWithPassword);
@@ -50,7 +51,8 @@ describe("connect to dummy server", function () {
         }, (error) => {
             expect(error).toBeDefined();
         }).finally(() => {
-            sshTunnel.close();
+            return sshTunnel.close();  
+        }).then(() => {
             done();
         });
     });
@@ -69,7 +71,7 @@ describe("connect to dummy server", function () {
         });
     });
 
-    it("should connect with password prompt directly to server", function (done) {
+    /* it("should connect with password prompt directly to server", function (done) {
         var c = Object.assign({}, sshConfigs.singleWithPassword);
         var temp = c.password;
         delete c.password;
@@ -112,7 +114,7 @@ describe("connect to dummy server", function () {
     });
 
     it("should connect to server with hopping", function (done) {
-        var sshTunnel = new SSHTunnel(sshConfigs.multiple);
+        var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
@@ -125,7 +127,7 @@ describe("connect to dummy server", function () {
     });
 
     it("should check the cache and listeners attached to server, after connect and after disconnect", function (done) {
-        var sshTunnel = new SSHTunnel(sshConfigs.multiple);
+        var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
             expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
@@ -153,8 +155,8 @@ describe("connect to dummy server", function () {
 
 
     it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
-        var sshTunnel = new SSHTunnel(sshConfigs.multiple);
-        var sshTunnel2 = new SSHTunnel(sshConfigs.multiple)
+        var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
+        var sshTunnel2 = new SSHTunnel(sshConfigs.couchmultiple)
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
             expect(Object.keys(SSHTunnel.__cache).length).toBe(2);
@@ -241,20 +243,33 @@ describe("connect to dummy server", function () {
             });
             done();
         });
-    }); */
+    });  
 
     it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
 
         var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
         sshTunnel.on("ssh:beforeconnect", (sshConnection, payload) => {
-            console.log("adsf");
+            console.log("beforeconnect", sshConnection.config.host);
         })
-        sshTunnel.connect().then((ssh) => {
-
+        sshTunnel.on("ssh:connect", (sshConnection, payload) => {
+            console.log("connect", sshConnection.config.host);
+        })
+        sshTunnel.on("ssh:beforedisconnect", (sshConnection, payload) => {
+            console.log("beforedisconnect", sshConnection.config.host);
+        })
+        sshTunnel.on("ssh:disconnect", (sshConnection, payload) => {
+            console.log("disconnect", sshConnection.config.host);
+        })
+        
+        sshTunnel.exec("ls -l").then(() => {
+            return sshTunnel.exec("ls -l")
+        }).then((ssh) => {
+            return sshTunnel.close()
         }).finally(() => {
             console.log("finish")
+            done();
         })
-    });
+    }); */
 
 
 });   

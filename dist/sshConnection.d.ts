@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import SSH2Promise = require('./index');
-import { TunnelConfig } from './TunnelConfig';
+import { SSH2Promise } from './index';
+import TunnelConfig from './TunnelConfig';
 export default class SSHConnection extends EventEmitter {
     __sshTunnels: Array<SSH2Promise>;
     config: any;

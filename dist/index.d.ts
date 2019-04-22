@@ -1,37 +1,13 @@
-import SSHConnection from './sshConnection';
+import SSHConstants from './sshConstants';
+import SSHUtils from './sshUtils';
 import SFTP from './sftp';
 import BaseSSH2Promise from './BaseSSH2Promise';
+import TunnelConfig from './TunnelConfig';
 declare class SSH2Promise extends BaseSSH2Promise {
     /**
  * For caching SSH Connection
  */
     static __cache: any;
-    static SSH: typeof SSHConnection;
-    static Utils: {
-        peek: (arr: any[]) => any;
-        endSocket: (socket: any) => void;
-        prompt: (question: string, cb: Function) => void;
-        createDeferredPromise: () => {
-            promise: Promise<{}>;
-            resolve: undefined;
-            reject: undefined;
-        };
-    };
-    static SFTP: typeof SFTP;
-    static Constants: {
-        "CHANNEL": {
-            SSH: string;
-            TUNNEL: string;
-            X11: string;
-        };
-        "STATUS": {
-            BEFORECONNECT: string;
-            CONNECT: string;
-            BEFOREDISCONNECT: string;
-            DISCONNECT: string;
-            CONTINUE: string;
-        };
-    };
     rawSFTP: () => Promise<any>;
     config: any;
     deregister: Array<any>;
@@ -55,6 +31,6 @@ declare class SSH2Promise extends BaseSSH2Promise {
     /**
      * Close SSH Connection
      */
-    close(): Promise<any[]>;
+    close(): Promise<{}>;
 }
-export = SSH2Promise;
+export { SSH2Promise, SSHUtils, SSHConstants, TunnelConfig };
