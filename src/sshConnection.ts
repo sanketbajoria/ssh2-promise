@@ -8,7 +8,7 @@ import { Stream } from 'stream';
 import { TunnelConfig } from './TunnelConfig';
 
 const SSH2 = require('ssh2'),
-    socks = require('socksv5');
+    socks = require('@heroku/socksv5');
 
 
 var defaultOptions = {
@@ -173,9 +173,9 @@ export default class SSHConnection extends EventEmitter {
         return this.spawn(cmd, null, { x11: true }).then((stream) => {
             this.__x11 = SSHUtils.createDeferredPromise();
             var code = 0;
-            stream.on('end', (err?:any) => {
+            stream.on('finish', (err?:any) => {
                 if (code !== 0) {
-                    this.__x11.promise.reject("X11 forwading not enabled on server");
+                    this.__x11.reject("X11 forwading not enabled on server");
                     this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X11 forwading not enabled on server"});
                 }
             }).on('exit', (exitcode:number) => {

@@ -5,7 +5,7 @@ const net = require("net");
 const fs = require("fs");
 const sshConstants_1 = require("./sshConstants");
 const sshUtils_1 = require("./sshUtils");
-const SSH2 = require('ssh2'), socks = require('socksv5');
+const SSH2 = require('ssh2'), socks = require('@heroku/socksv5');
 var defaultOptions = {
     reconnect: true,
     port: 22,
@@ -144,9 +144,9 @@ class SSHConnection extends events_1.EventEmitter {
         return this.spawn(cmd, null, { x11: true }).then((stream) => {
             this.__x11 = sshUtils_1.default.createDeferredPromise();
             var code = 0;
-            stream.on('end', (err) => {
+            stream.on('finish', (err) => {
                 if (code !== 0) {
-                    this.__x11.promise.reject("X11 forwading not enabled on server");
+                    this.__x11.reject("X11 forwading not enabled on server");
                     this.emit(sshConstants_1.default.CHANNEL.X11, sshConstants_1.default.STATUS.DISCONNECT, { err: err, msg: "X11 forwading not enabled on server" });
                 }
             }).on('exit', (exitcode) => {

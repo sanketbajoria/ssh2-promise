@@ -68,9 +68,13 @@ describe("exec n spawn cmd", function () {
     it("x11 should not get established", function (done) {
         sshTunnel.x11("xeyes").then((data) => {
             expect('1').toBe('2');
+            done()
         }, (err) => {
             expect(err).toBeDefined();
-        }).finally(done);
+            done();
+        }).finally(() => {
+            done();
+        });
     });
 
     it("subsys should be established", function (done) {
@@ -79,7 +83,9 @@ describe("exec n spawn cmd", function () {
             expect(stream.pipe).toBeDefined();
         }, (err) => {
             expect('1').toBe('2');
-        }).finally(done);
+        }).finally(() => {
+            done()
+        });
     });
     
     it("subsys should be established", function (done) {
@@ -87,7 +93,9 @@ describe("exec n spawn cmd", function () {
             expect('1').toBe('2');
         }, (err) => {
             expect(err).toBeDefined();
-        }).finally(done);
+        }).finally(() => {
+            done()
+        });
     });
 
     afterAll(() => {

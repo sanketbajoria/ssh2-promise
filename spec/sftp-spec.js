@@ -20,7 +20,8 @@ describe("sftp cmd", function () {
     it("read/write file", function (done) {
         (async function(){
             try{
-                await sftp.rmdir('/dummy');
+                await sftp.mkdir('/home/ubuntu/dummy')
+                await sftp.rmdir('/home/ubuntu/dummy');
                 expect(1).toBe(1);
             }catch(err){
                 expect(1).toBe(0);
@@ -29,17 +30,18 @@ describe("sftp cmd", function () {
             }
         })();
     });
-/* 
+
    it("read/write file", function (done) {
         (async function(){
             try{
-                await sftp.writeFile('/dummy', "testing123");
-                expect(1).toBe(1);
-                var content = await sftp.readFile('/dummy', "utf8");
+                await sshTunnel.exec("rm", ["-rf", "/home/ubuntu/dummy"])
+                await sftp.writeFile('/home/ubuntu/dummy', "testing123");
+                var content = await sftp.readFile('/home/ubuntu/dummy', "utf8");
                 expect(content).toBe("testing123");
             }catch(err){
                 expect(1).toBe(0);
             }finally{
+                sshTunnel.exec("rm", ["-rf", "/home/ubuntu/dummy"])
                 done();
             }
         })();
@@ -76,8 +78,9 @@ describe("sftp cmd", function () {
         sftp.createWriteStream("/home/ubuntu/abc").then((stream) => {
             expect(stream).toBeDefined();
             stream.write('dummy\n\n\nasdfjsdaf\n', () => {
-                stream.end();
-                done();
+                stream.end(() => {
+                    done();
+                });
             });
         }, (error) => {
             expect('1').toBe('2');
@@ -147,32 +150,32 @@ describe("sftp cmd", function () {
         }).finally(() => {
             done();
         });
-    }); */
+    }); 
 
     /* it("rename file", function (done) {
         sftp.createWriteStream("/home/ubuntu/abc").then((stream) => {
             expect(stream).toBeDefined();
             stream.write('dummy\n\n\nasdfjsdaf\n', () => {
-                stream.end();
-                expect('1').toBe('1');
-                sftp.rename("/home/ubuntu/abc", "/home/ubuntu/newabc").then(() => {
-                    expect('1').toBe('1')
-                }).catch((err) => {
-                    console.log(err.message);
-                    expect('1').toBe('2')
-                }).finally(() => {
-                    done();
-                }) 
+                stream.end(() => {
+                    expect('1').toBe('1');
+                    sftp.rename("/home/ubuntu/abc", "/home/ubuntu/newabc").then(() => {
+                        expect('1').toBe('1')
+                    }).catch((err) => {
+                        console.log(err.message);
+                        expect('1').toBe('2')
+                    }).finally(() => {
+                        done();
+                    })
+                });
             });
         }, (error) => {
             expect('1').toBe('2');
             expect(error).toBeUndefined();
             done();
         })
-        
-    }); */
+    });  */
 
-    /* it("move file to different location", function (done) {
+    it("move file to different location", function (done) {
         sftp.changeOwner("/home/ubuntu/abc", 0, 0).then((handle) => {
             expect('1').toBe('2');
         }, (err) => {
@@ -181,7 +184,7 @@ describe("sftp cmd", function () {
         }).finally(() => {
             done();
         });
-    }); */
+    });
    
     afterAll(() => {
         sshTunnel.close()
