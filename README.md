@@ -4,7 +4,7 @@
 It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too. It can handle 'continue' event automatically, While doing any sftp operation.
 This module is written in `Typescript`. It can be used in `Javascript` or in `Typescript` with full type support.
 
-<p style="color:red"><b><i>Change in sftp api, now ssh.sftp() provide wrapped SFTP session instead of raw sftp session.</i></i></p>
+<p style="color:red"><b><i>Change in sftp api, now ssh.sftp() provide wrapped SFTP session instead of raw sftp session.</i></b></p>
 
 # Installation
 
