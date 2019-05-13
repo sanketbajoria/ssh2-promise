@@ -2,7 +2,7 @@ var SSHTunnel = require("../dist/index");
 var SSHConstants = require("../dist/index").Constants;
 
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 Promise.prototype.finally = function (cb) {
     const res = () => this;
     const fin = () => Promise.resolve(cb()).then(res);
@@ -112,16 +112,23 @@ describe("connect to dummy server", function () {
     });
 
     it("should connect to server with hopping", function (done) {
+        var sshTunnel1 = new SSHTunnel(sshConfigs.multiple[0])
         var sshTunnel = new SSHTunnel(sshConfigs.multiple);
-        sshTunnel.connect().then((ssh) => {
-            expect(ssh).toBeDefined();
-        }, (error) => {
-            expect('1').toBe('2');
-            expect(error).toBeUndefined();
+        sshTunnel1.connect().then(() => {
+            return sshTunnel.connect().then((ssh) => {
+                expect(ssh).toBeDefined();
+            }, (error) => {
+                expect('1').toBe('2');
+                expect(error).toBeUndefined();
+            }).finally(() => {
+                sshTunnel.close();
+                console.log("closed one")
+                done();
+            });
         }).finally(() => {
-            sshTunnel.close();
-            done();
-        });
+            sshTunnel1.close();
+            done()
+        })
     });
 
     it("should check the cache and listeners attached to server, after connect and after disconnect", function (done) {
@@ -256,6 +263,5 @@ describe("connect to dummy server", function () {
             done();
         })
     });
-
 
 });   

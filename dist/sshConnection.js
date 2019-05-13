@@ -180,7 +180,7 @@ class SSHConnection extends events_1.EventEmitter {
             return this.__$connectPromise;
         this.__$connectPromise = new Promise((resolve, reject) => {
             this.emit(sshConstants_1.default.CHANNEL.SSH, sshConstants_1.default.STATUS.BEFORECONNECT);
-            if (!this.config || typeof this.config === 'function' || !this.config.host || !this.config.username) {
+            if (!this.config || typeof this.config === 'function' || !(this.config.host || this.config.sock) || !this.config.username) {
                 reject("Invalid SSH connection configuration host/username can't be empty");
                 this.__$connectPromise = null;
                 return;

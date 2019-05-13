@@ -22,10 +22,13 @@ export default {
      * @param {*} socket 
      */
     endSocket: function(socket:any) {
-        if(socket && socket.writable){
-            socket.end('\x03');
-            socket.signal('INT');
-            socket.signal('KILL');
+        if(socket){
+            if(socket.writable){
+                socket.end('\x03');
+                socket.signal('INT');
+                socket.signal('KILL');
+            }
+            socket.close();
         }
     },
     /**
