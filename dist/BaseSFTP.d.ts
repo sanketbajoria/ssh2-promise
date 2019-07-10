@@ -52,7 +52,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Array<any>>`
      */
-    readData(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>>;
+    read(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>>;
     /**
      * (Client-only)
      * Reads length bytes from the resource associated with file starting at position and stores the bytes in buffer starting at
@@ -75,7 +75,7 @@ export default abstract class BaseSFTP extends EventEmitter {
     *
     * Returns `Promise<void>`
     */
-    writeData(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<void>;
+    write(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<void>;
     /**
     * (Client-only)
     * Writes length bytes from buffer starting at offset to the resource associated with file starting at position.

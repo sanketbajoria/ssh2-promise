@@ -45,7 +45,7 @@ class BaseSFTP extends events_1.EventEmitter {
      *
      * Returns `Promise<Array<any>>`
      */
-    readData(handle, buffer, offset, length, position) {
+    read(handle, buffer, offset, length, position) {
         return Promise.reject(false);
     }
     /**
@@ -74,7 +74,7 @@ class BaseSFTP extends events_1.EventEmitter {
     *
     * Returns `Promise<void>`
     */
-    writeData(handle, buffer, offset, length, position) {
+    write(handle, buffer, offset, length, position) {
         return Promise.reject(false);
     }
     /**
