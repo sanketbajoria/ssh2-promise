@@ -194,4 +194,4 @@ class SSH2Promise extends BaseSSH2Promise {
 
 }
 
-export = SSH2Promise;
+export default SSH2Promise;
