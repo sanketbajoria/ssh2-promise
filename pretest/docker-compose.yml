@@ -1,0 +1,10 @@
+version: "2.4"
+services:
+  ssh-with-password:
+    build: ./ssh
+    ports:
+      - "8331:22"
+  ssh-with-key:
+    build: ./ssh
+    ports:
+      - "8332:22"
