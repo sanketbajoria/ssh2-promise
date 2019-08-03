@@ -1,4 +1,4 @@
-FROM ansible:latest
+FROM alpine:latest
 RUN apk add --update openssh sudo openssh-server-pam\
     && sed -ri 's/#UsePAM no/UsePAM yes/g' /etc/ssh/sshd_config \
     && sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
