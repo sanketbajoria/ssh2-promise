@@ -6,7 +6,7 @@ Promise.prototype.finally = function (cb) {
     return this.then(fin, fin);
 };
 var fs = require("fs");
-var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+var sshConfigs = require('./fixture') //var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
 
 
 describe("sftp cmd", function () {

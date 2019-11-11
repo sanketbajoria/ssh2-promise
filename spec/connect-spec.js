@@ -9,7 +9,7 @@ Promise.prototype.finally = function (cb) {
     return this.then(fin, fin);
 };
 var fs = require("fs");
-var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+var sshConfigs = require('./fixture')//JSON.parse(fs.readFileSync("./spec/fixture.json"));
 var util = require('util');
 
 
