@@ -15,6 +15,6 @@ install:
   - npm install
   - npm run-script build
 script:
-  - cd pretest && docker-compose up -d && cd ..
+  - cd pretest && docker-compose up -d && cd .. && sleep 10
   - npm test
   
