@@ -1,5 +1,5 @@
 node_modules
 .vscode
-spec/fixture.json
+spec/fixture.old.json
 host.key
 **test*

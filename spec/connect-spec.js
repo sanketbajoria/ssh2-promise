@@ -262,6 +262,5 @@ describe("connect to dummy server", function () {
             console.log("finish")
             done();
         })
-    });
-
+    }); 
 });   

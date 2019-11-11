@@ -1,0 +1,35 @@
+{
+    "multiple": [{
+        "username": "sanket",
+        "host": "localhost",
+        "password": "sanket",
+        "port": 8331
+    }, {
+        "username": "sanket",
+        "host": "ssh-with-key",
+        "identity": "D:/git/ssh2-promise/spec/test.pem"
+    }],
+    "couchmultiple": [{
+        "username": "sanket",
+        "host": "localhost",
+        "password": "sanket",
+        "port": 8331
+    }, {
+        "username": "sanket",
+        "host": "ssh-with-key",
+        "identity": "D:/git/ssh2-promise/spec/test.pem"
+    }],
+    "singleWithPassword": {
+        "username": "sanket",
+        "host": "localhost",
+        "password": "sanket",
+        "port": 8331
+    },
+    "singleWithKey": {
+        "username": "sanket",
+        "host": "localhost",
+        "port": 8332,
+        "reconnect": false,
+        "identity": "D:/git/ssh2-promise/spec/test.pem"
+    }
+}

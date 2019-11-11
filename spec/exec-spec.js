@@ -16,7 +16,7 @@ describe("exec n spawn cmd", function () {
 
     it("exec a command", function (done) {
         sshTunnel.exec("whoami").then((username) => {
-            expect(username.trim()).toEqual("ubuntu");
+            expect(username.trim()).toEqual("sanket");
         }, (error) => {
             expect(error).toBeUndefined();
         }).finally(() => {
