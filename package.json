@@ -46,6 +46,7 @@
     "@types/node": "^8.5.5",
     "@types/ssh2": "0.5.35",
     "@types/jasmine": "^2.8.9",
+    "@types/ssh2-streams": "0.1.6",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.2.3",
     "jasmine": "^2.8.0",
