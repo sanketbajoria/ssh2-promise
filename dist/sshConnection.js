@@ -94,9 +94,9 @@ class SSHConnection extends events_1.EventEmitter {
                     if (err)
                         return reject(err);
                     stream.on('close', function () {
-                        console.log(`Closed stream - ${cmd}`);
+                        //console.log(`Closed stream - ${cmd}`);
                     }).on('finish', function () {
-                        console.log(`Closed stream - ${cmd}`);
+                        //console.log(`Closed stream - ${cmd}`);
                     });
                     stream.kill = function () {
                         sshUtils_1.default.endSocket(stream);

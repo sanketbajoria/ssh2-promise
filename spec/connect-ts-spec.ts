@@ -9,7 +9,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
     return this.then(fin, fin);
 }; */
 var fs = require("fs");
-var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+var sshConfigs = require('./fixture')//JSON.parse(fs.readFileSync("./spec/fixture.json"));
 var util = require('util');
 
 describe("connect to dummy server", function () {

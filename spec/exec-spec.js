@@ -6,7 +6,7 @@ Promise.prototype.finally = function (cb) {
     return this.then(fin, fin);
 };
 var fs = require("fs");
-var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+var sshConfigs = require('./fixture')//JSON.parse(fs.readFileSync("./spec/fixture.json"));
 
 describe("exec n spawn cmd", function () {
     var sshTunnel;
@@ -16,7 +16,7 @@ describe("exec n spawn cmd", function () {
 
     it("exec a command", function (done) {
         sshTunnel.exec("whoami").then((username) => {
-            expect(username.trim()).toEqual("ubuntu");
+            expect(username.trim()).toEqual("sanket");
         }, (error) => {
             expect(error).toBeUndefined();
         }).finally(() => {

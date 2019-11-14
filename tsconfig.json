@@ -3,6 +3,7 @@
         "src/index.ts",
         "src/sftp.ts",
         "src/BaseSFTP.ts",
+        "src/BaseSSH2Promise.ts",
         "src/sshConnection.ts",
         "src/sshConstants.ts",
         "src/sshUtils.ts",
