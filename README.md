@@ -12,6 +12,18 @@ This module is written in `Typescript`. It can be used in `Javascript` or in `Ty
 npm install ssh2-promise;
 ```
 
+# Local Testing
+#### Prerequisite to be installed
+- docker
+- docker-compose
+
+```bash
+cd pretest
+docker-compose up -d
+cd ..
+yarn test
+```
+
 # Usage
 All examples are shown in promisify and async-await manner.
 
@@ -569,8 +581,6 @@ An object with the same attributes as an ATTRS object with the addition of the f
 * `stats.isFIFO()`
 
 * `stats.isSocket()`
-
-# Testing
 
 
 # LICENSE
