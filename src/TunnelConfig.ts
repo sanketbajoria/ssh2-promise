@@ -4,5 +4,4 @@ export interface TunnelConfig {
     remotePort?: number;
     socks?: boolean;
     name?: string;
-
 }

@@ -1,4 +1,3 @@
-import { EventEmitter } from "events";
 import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';

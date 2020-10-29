@@ -1,6 +1,7 @@
 import * as stream from "stream";
 import { EventEmitter } from 'events';
-import { InputAttributes, Stats, ReadStreamOptions, WriteStreamOptions, TransferOptions, FileEntry } from 'ssh2-streams';
+import { InputAttributes, Stats, ReadStreamOptions, WriteStreamOptions, TransferOptions } from 'ssh2-streams';
+
 export default abstract class BaseSFTP extends EventEmitter {
 
     /**

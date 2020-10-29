@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SSH2Promise = require('./index');
-import { Stream } from 'stream';
 import { TunnelConfig } from './TunnelConfig';
 
 const SSH2 = require('ssh2'),
