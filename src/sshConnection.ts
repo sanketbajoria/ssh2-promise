@@ -2,15 +2,26 @@ import { EventEmitter } from 'events';
 import * as net from 'net';
 import * as fs from 'fs';
 import SSHConstants from './sshConstants';
-import SSHUtils from './sshUtils';
+import SSHUtils, { Deferred } from './sshUtils';
 import SSH2Promise = require('./index');
 import { TunnelConfig } from './TunnelConfig';
+import {
+    Client, ClientChannel, ClientErrorExtensions, ConnectConfig, ExecOptions, SFTPWrapper, ShellOptions,
+} from 'ssh2';
+import { PathLike } from 'fs';
+import { Server } from "net";
 
-const SSH2 = require('ssh2'),
-    socks = require('@heroku/socksv5');
+const socks = require('@heroku/socksv5');
 
+interface SSHConfig extends ConnectConfig {
+    uniqueId: string;
+    reconnect: boolean;
+    reconnectTries: number;
+    reconnectDelay: number;
+    identity: PathLike;
+}
 
-var defaultOptions = {
+const defaultOptions: Partial<SSHConfig> = {
     reconnect: true,
     port: 22,
     reconnectTries: 10,
@@ -21,25 +32,23 @@ export default class SSHConnection extends EventEmitter {
 
     __sshTunnels: Array<SSH2Promise>;
 
-    config: any;
+    config: SSHConfig;
 
-    [index:string] : any;
+    private activeTunnels:{[index:string]: TunnelConfig & {server: Server}} = {};
 
-    private activeTunnels:{[index:string]: any} = {};
+    private __$connectPromise: Promise<SSHConnection> = null;
 
-    private __$connectPromise:Promise<any> = null;
+    private __retries: number = 0;
 
-    private __retries:number = 0;
+    private __err: Error & ClientErrorExtensions & { code?: string } = null;
 
-    private __err:any = null;
+    private __sftp: Promise<SFTPWrapper> = null;
 
-    private __sftp:any = null;
+    private __x11: Deferred<void> = null;
 
-    private __x11:any = null;
+    private sshConnection: Client = null;
 
-    private sshConnection:any = null;
-
-    constructor(options:any) {
+    constructor(options: SSHConfig) {
         super();
         this.config = Object.assign({}, defaultOptions, options);
         this.config.uniqueId = this.config.uniqueId || `${this.config.username}@${this.config.host}`;
@@ -47,12 +56,11 @@ export default class SSHConnection extends EventEmitter {
 
    /**
      * Emit message on this channel
-     * @param {*} channel 
-     * @param {*} status 
-     * @param {*} ssh 
-     * @param {*} payload 
+     * @param {*} channel
+     * @param {*} status
+     * @param {*} payload
      */
-    emit(channel:string, status:string, payload?:any):boolean {
+    emit(channel: string, status: string, payload?: any): boolean {
         super.emit(channel, status, this, payload);
         return super.emit(`${channel}:${status}`, this, payload);
     }
@@ -61,15 +69,10 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get shell socket
      */
-    shell(options?:any): Promise<any> {
-        options = options || {};
+    shell(options: ShellOptions = {}): Promise<ClientChannel> {
         return this.connect().then(() => {
-            return new Promise((resolve, reject) => {
-                this.sshConnection.shell(options, (err:any, stream:any) => {
-                    if (err)
-                        return reject(err);
-                    resolve(stream);
-                });
+            return new Promise<ClientChannel>((resolve, reject) => {
+                this.sshConnection.shell(options, (err, stream) => err ? reject(err) : resolve(stream));
             });
         })
     }
@@ -77,15 +80,11 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a sftp session
      */
-    sftp(createNew: boolean): Promise<any> {
+    sftp(createNew: boolean): Promise<SFTPWrapper> {
         return this.connect().then(() => {
             if (createNew || !this.__sftp) {
                 this.__sftp = new Promise((resolve, reject) => {
-                    this.sshConnection.sftp((err:any, sftp:any) => {
-                        if (err)
-                            reject(err);
-                        resolve(sftp);
-                    });
+                    this.sshConnection.sftp((err, sftp) => err ? reject(err) : resolve(sftp));
                 });
             }
             return this.__sftp;
@@ -95,27 +94,22 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a subsys
      */
-    subsys(cmd:string): Promise<any> {
+    subsys(cmd: string): Promise<ClientChannel> {
         return this.connect().then(() => {
             return new Promise((resolve, reject) => {
-                this.sshConnection.subsys(cmd, (err:any, stream:any) => {
-                    if (err)
-                        return reject(err);
-                    resolve(stream);
-                });
+                this.sshConnection.subsys(cmd, (err, stream) => err ? reject(err) : resolve(stream));
             });
-        })
+        });
     }
 
     /**
      * Spawn a command
      */
-    spawn(cmd:string, params?:Array<string>, options?:any): Promise<any> {
-        options = options || {};
+    spawn(cmd: string, params?: Array<string>, options: ExecOptions = {}): Promise<ClientChannel> {
         cmd += (Array.isArray(params) ? (" " + params.join(" ")) : "");
         return this.connect().then(() => {
             return new Promise((resolve, reject) => {
-                this.sshConnection.exec(cmd, options, (err:any, stream:any) => {
+                this.sshConnection.exec(cmd, options, (err, stream) => {
                     if (err)
                         return reject(err);
                     stream.on('close', function () {
@@ -123,32 +117,28 @@ export default class SSHConnection extends EventEmitter {
                     }).on('finish', function () {
                         //console.log(`Closed stream - ${cmd}`);
                     });
-                    stream.kill = function () {
-                        SSHUtils.endSocket(stream);
-                    }
                     resolve(stream);
-                })
-            })
-        })
+                });
+            });
+        });
     }
 
     /**
      * Exec a command
      */
-    exec(cmd:string, params?:Array<string>, options?:any): Promise<any> {
-        options = options || {};
+    exec(cmd: string, params?: Array<string>, options: ExecOptions = {}): Promise<string> {
         cmd += (Array.isArray(params) ? (" " + params.join(" ")) : "");
         return this.connect().then(() => {
             return new Promise((resolve, reject) => {
-                this.sshConnection.exec(cmd, options, (err:any, stream:any) => {
+                this.sshConnection.exec(cmd, options, (err, stream) => {
                     if (err)
                         return reject(err);
                     var buffer = "";
                     stream.on('close', function () {
                         resolve(buffer);
-                    }).on('data', function (data:any) {
+                    }).on('data', function (data: string) {
                         buffer += data;
-                    }).stderr.on('data', function (data:any) {
+                    }).stderr.on('data', function (data) {
                         reject(data);
                     });
                 })
@@ -159,7 +149,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a Socks Port
      */
-    getSocksPort(localPort:number): Promise<number> {
+    getSocksPort(localPort: number): Promise<number> {
         return this.addTunnel({ name: "__socksServer", socks: true, localPort: localPort }).then((tunnel) => {
             return tunnel.localPort;
         });
@@ -168,11 +158,11 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get a X11 port
      */
-    x11(cmd:string): Promise<any> {
+    x11(cmd: string): Promise<void> {
         return this.spawn(cmd, null, { x11: true }).then((stream) => {
             this.__x11 = SSHUtils.createDeferredPromise();
             var code = 0;
-            stream.on('finish', (err?:any) => {
+            stream.on('finish', (err: Error & ClientErrorExtensions) => {
                 if (code !== 0) {
                     this.__x11.reject("X11 forwading not enabled on server");
                     this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X11 forwading not enabled on server"});
@@ -190,7 +180,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close SSH Connection
      */
-    close(): Promise<any> {
+    close(): Promise<void> {
         this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.BEFOREDISCONNECT);
         return this.closeTunnel().then(() => {
             if (this.sshConnection){
@@ -203,7 +193,7 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Connect the SSH Connection
      */
-    connect(c?:any): Promise<any> {
+    connect(c?: SSHConfig): Promise<SSHConnection> {
         this.config = Object.assign(this.config, c);
         ++this.__retries;
 
@@ -230,14 +220,14 @@ export default class SSHConnection extends EventEmitter {
             }
 
             //Start ssh server connection
-            this.sshConnection = new SSH2();
-            this.sshConnection.on('keyboard-interactive', (name:any, instructions:any, lang:any, prompts:Array<any>, finish:Function) => {
+            this.sshConnection = new Client();
+            this.sshConnection.on('keyboard-interactive', (name, instructions, lang, prompts, finish) => {
                 prompts.forEach((prompt) => {
-                    SSHUtils.prompt(prompt.prompt, (password:string) => {
+                    SSHUtils.prompt(prompt.prompt, (password) => {
                         finish([password]);
                     })
                 });
-            }).on('ready', (err:any) => {
+            }).on('ready', (err: Error & ClientErrorExtensions) => {
                 if (err) {
                     this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, { err: err });
                     this.__$connectPromise = null;
@@ -247,7 +237,7 @@ export default class SSHConnection extends EventEmitter {
                 this.__retries = 0;
                 this.__err = null;
                 resolve(this);
-            }).on('x11', (info:any, accept:Function, reject:Function) => {
+            }).on('x11', (info: any, accept: any) => {
                 var xserversock = new net.Socket();
                 xserversock.on('connect', () => {
                   var xclientsock = accept();
@@ -258,15 +248,15 @@ export default class SSHConnection extends EventEmitter {
                     this.__x11.reject("X Server not running locally.");
                     this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X Server not running locally."})
                 });
-                // connects to localhost:0.0 
+                // connects to localhost:0.0
                 xserversock.connect(6000, 'localhost');
-            }).on('error', (err:any) => {
+            }).on('error', (err) => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
                 this.__err = err;
                 //reject(err);
                 //this.__$connectPromise = null;
             }).on('continue', () => {
-               this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE); 
+               this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONTINUE);
             }).on('close', () => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: this.__err});
                 if (this.config.reconnect && this.__retries <= this.config.reconnectTries && this.__err != null && this.__err.level != "client-authentication" && this.__err.code != 'ENOTFOUND') {
@@ -285,14 +275,14 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Get existing tunnel by name
      */
-    getTunnel(name:string) {
+    getTunnel(name: string) {
         return this.activeTunnels[name];
     }
 
     /**
      * Add new tunnel if not exist
      */
-    addTunnel(tunnelConfig: TunnelConfig): Promise<any> {
+    addTunnel(tunnelConfig: TunnelConfig): Promise<TunnelConfig & {server: Server}> {
         tunnelConfig.name = tunnelConfig.name || `${tunnelConfig.remoteAddr}@${tunnelConfig.remotePort}`;
         this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.BEFORECONNECT, {tunnelConfig: tunnelConfig});
         if (this.getTunnel(tunnelConfig.name)) {
@@ -300,7 +290,7 @@ export default class SSHConnection extends EventEmitter {
             return Promise.resolve(this.getTunnel(tunnelConfig.name))
         } else {
             return new Promise((resolve, reject) => {
-                var server:any;
+                var server: any;
                 if (tunnelConfig.socks) {
                     server = socks.createServer((info:any, accept:Function, deny:Function) => {
                         this.connect().then(() => {
@@ -308,13 +298,13 @@ export default class SSHConnection extends EventEmitter {
                                 info.srcPort,
                                 info.dstAddr,
                                 info.dstPort,
-                                (err:any, stream:any) => {
+                                (err, stream) => {
                                     if (err) {
                                         this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
                                         return deny();
                                     }
-                                    var clientSocket;
-                                    if (clientSocket = accept(true)) {
+                                    const clientSocket = accept(true);
+                                    if (clientSocket) {
                                         stream.pipe(clientSocket).pipe(stream).on('close', () => {
                                             stream.end();
                                         });
@@ -328,10 +318,10 @@ export default class SSHConnection extends EventEmitter {
                     server = net.createServer()
                         .on('connection', (socket) => {
                             this.connect().then(() => {
-                                this.sshConnection.forwardOut('', 0, tunnelConfig.remoteAddr, tunnelConfig.remotePort, (err:any, stream:any) => {
+                                this.sshConnection.forwardOut('', 0, tunnelConfig.remoteAddr, tunnelConfig.remotePort, (err, stream) => {
                                     if (err) {
                                         this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
-                                        return err;
+                                        return;
                                     }
                                     stream.pipe(socket).pipe(stream).on('close', () => {
                                         stream.end();
@@ -347,7 +337,7 @@ export default class SSHConnection extends EventEmitter {
                     this.activeTunnels[tunnelConfig.name] = Object.assign({}, { server: server }, tunnelConfig);
                     this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.CONNECT, {tunnelConfig: tunnelConfig});
                     resolve(this.activeTunnels[tunnelConfig.name]);
-                }).on('error', (err:any) => {
+                }).on('error', (err: any) => {
                     this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: tunnelConfig, err: err});
                     server.close();
                     reject(err);
@@ -361,21 +351,29 @@ export default class SSHConnection extends EventEmitter {
     /**
      * Close the tunnel
      */
-    closeTunnel(name?:string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            if (name && this.activeTunnels[name]) {
+    closeTunnel(name?: string): Promise<void> {
+        if (name && this.activeTunnels[name]) {
+            return new Promise((resolve) => {
                 var tunnel = this.activeTunnels[name];
-                this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.BEFOREDISCONNECT, {tunnelConfig: tunnel});
+                this.emit(
+                  SSHConstants.CHANNEL.TUNNEL,
+                  SSHConstants.STATUS.BEFOREDISCONNECT,
+                  { tunnelConfig: tunnel }
+                );
                 tunnel.server.close(() => {
-                    this.emit(SSHConstants.CHANNEL.TUNNEL, SSHConstants.STATUS.DISCONNECT, {tunnelConfig: this.activeTunnels[name]});
+                    this.emit(
+                      SSHConstants.CHANNEL.TUNNEL,
+                      SSHConstants.STATUS.DISCONNECT,
+                      { tunnelConfig: this.activeTunnels[name] }
+                    );
                     delete this.activeTunnels[name];
                     resolve();
                 });
-            } else if (!name) {
-                var tunnels = Object.keys(this.activeTunnels).map((key) => this.closeTunnel(key));
-                resolve(Promise.all(tunnels));
-            }
-        });
+            });
+        } else if (!name) {
+            var tunnels = Object.keys(this.activeTunnels).map((key) => this.closeTunnel(key));
+            return Promise.all(tunnels).then(() => {});
+        }
     }
 
 }

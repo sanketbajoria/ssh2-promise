@@ -10,18 +10,24 @@ var mutableStdout = new Writable({
 });
 mutableStdout.muted = false;
 
+export interface Deferred<T> {
+    resolve: Function;
+    reject: Function;
+    promise: Promise<T>;
+}
+
 export default {
     /**
      * Peek the array
      */
-    peek: function(arr:Array<any>) {
+    peek: function(arr: Array<any>) {
         return arr[arr.length - 1]
     },
     /**
      * End pty socket session by sending kill signal
-     * @param {*} socket 
+     * @param {*} socket
      */
-    endSocket: function(socket:any) {
+    endSocket: function(socket: any) {
         if(socket){
             if(socket.writable){
                 socket.end('\x03');
@@ -34,13 +40,13 @@ export default {
     /**
      * Prompt for asking anything
      */
-    prompt: function(question:string, cb:Function) {
+    prompt: function(question: string, cb: (password: string) => void) {
         var rl = readline.createInterface({
             input: process.stdin,
             output: mutableStdout,
             terminal: true
         });
-        rl.question(question, function(password:string) {
+        rl.question(question, function(password: string) {
             cb(password);
             rl.close();
         });
@@ -50,7 +56,7 @@ export default {
     /**
      * Create a Deferred promise
      */
-    createDeferredPromise: function(){
+    createDeferredPromise: function() {
         var __resolve, __reject;
         var __promise = new Promise((resolve, reject) => {
             __resolve = resolve;
@@ -60,6 +66,6 @@ export default {
             promise: __promise,
             resolve: __resolve,
             reject: __reject
-        }
+        } as Deferred<any>;
     }
 }
