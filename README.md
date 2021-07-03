@@ -35,6 +35,18 @@ var SSH2Promise = require('ssh2-promise');
 
 //or in typescript manner
 import SSH2Promise = require('ssh2-promise');
+
+//or in typescript manner (with esModuleInterop enabled)
+import SSH2Promise from 'ssh2-promise';
+
+
+//To import SFTP Type definition in typescript
+
+//without esModuleInterop
+import SFTP = require('ssh2-promise/lib/sftp')
+
+//with esModuleInterop
+import SFTP from 'ssh2-promise/lib/sftp'
 ```
 
 #### Connect to SSH Server
@@ -147,7 +159,10 @@ var ssh = new SSH2Promise(sshconfig);
 //Get a sftp session
 //see: https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md
 
-var sftp = ssh.sftp()
+//in typescript import sftp type definition
+//import SFTP = require('ssh2-promise/lib/sftp')
+
+var sftp/*:SFTP*/ = ssh.sftp()
 sftp.readdir("/").then((data) => {
   console.log(data); //file listing
 }).catch((err) => {
@@ -188,8 +203,10 @@ ssh.shell().then((socket) => {
 #### sftp operation in promise & async await manner
 
 ```javascript
+//in typescript import sftp type definition
+//import SFTP = require('ssh2-promise/lib/sftp')
 var ssh = new SSH2Promise(sshconfig);
-var sftp = ssh.sftp(); //or new SSH2Promise.SFTP(ssh);
+var sftp/*:SFTP*/ = ssh.sftp(); //or new SSH2Promise.SFTP(ssh);
 
 //We can do all sftp client operation listed in "https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md" in promisify or async await manner.
 
@@ -307,9 +324,8 @@ ssh.subsys('sftp').then((stream) => {
 ```
 
 # API
-`require('ssh2-promise')` or `require('ssh2-promise').SSH2` returns a **SSH2** constructor.
-
-`require('ssh2-promise').SFTP` returns a **SFTP** constructor.
+`require('ssh2-promise')`
+`require('ssh2-promise\lib\sftp')` 
 
 ## SSH2
 

@@ -1,4 +1,4 @@
-var SSHTunnel = require("../dist/index");
+var SSHTunnel = require("../lib/index");
 var fs = require('fs')
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 Promise.prototype.finally = function (cb) {
@@ -54,6 +54,8 @@ describe("sftp cmd", function () {
                 fs.writeFileSync('./test.txt', "Test module");
                 await sftp.fastPut('./test.txt', "/home/sanket/test2.txt");
                 expect(1).toBe(1);
+                await sftp.fastGet("/home/sanket/test2.txt", './test2.txt');
+                fs.unlinkSync("./test2.txt");
                 var content = await sftp.readFile('/home/sanket/test2.txt', "utf8");
                 expect(content).toBe("Test module");
             }catch(err){

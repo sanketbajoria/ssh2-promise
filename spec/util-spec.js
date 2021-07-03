@@ -1,4 +1,4 @@
-var SSHUtils = require("../dist/index").Utils;
+var SSHUtils = require("../lib/index").Utils;
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
 Promise.prototype.finally = function(cb) {
     const res = () => this;

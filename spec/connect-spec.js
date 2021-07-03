@@ -1,5 +1,5 @@
-var SSHTunnel = require("../dist/index");
-var SSHConstants = require("../dist/index").Constants;
+var SSHTunnel = require("../lib/index");
+var SSHConstants = require("../lib/index").Constants;
 
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;

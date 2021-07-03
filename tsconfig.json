@@ -14,14 +14,16 @@
         "target": "es6",
         "noImplicitAny": true,
         "moduleResolution": "node",
-        "outDir": "./dist",
+        "outDir": "./lib",
         "declaration": true,
         "baseUrl": ".",
         "paths": {
             "*": [
                 "node_modules/*"
             ]
-        }
+        },
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
     },
     "include": [
         "src/**/*.ts"

@@ -1,5 +1,5 @@
 import SSHConstants from './sshConstants';
-import SSH2Promise = require('./index');
+import SSH2Promise from './index';
 import BaseSFTP from './BaseSFTP';
 import { ReadStreamOptions, WriteStreamOptions } from 'ssh2-streams';
 
@@ -9,7 +9,7 @@ var methods = ["fastGet", "fastPut", "open", "close", "readFile", "writeFile", "
 
 var enhanceMethods: any = {"readFileData": "readData", "writeFileData": "writeData", "getStat": "fstat", "setStat": "fsetstat", "changeTimestamp": "futimes", "changeOwner": "fchown", "changeMode": "fchmod"};
 
-export default class SFTP extends BaseSFTP {
+class SFTP extends BaseSFTP {
 
     ssh:SSH2Promise;
     
@@ -91,3 +91,5 @@ export default class SFTP extends BaseSFTP {
         });
     }
 }
+
+export = SFTP

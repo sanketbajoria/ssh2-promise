@@ -3,7 +3,7 @@ import * as net from 'net';
 import * as fs from 'fs';
 import SSHConstants from './sshConstants';
 import SSHUtils, { Deferred } from './sshUtils';
-import SSH2Promise = require('./index');
+import SSH2Promise from './index';
 import { TunnelConfig } from './TunnelConfig';
 import {
     Client, ClientChannel, ClientErrorExtensions, ConnectConfig, ExecOptions, SFTPWrapper, ShellOptions,

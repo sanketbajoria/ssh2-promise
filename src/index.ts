@@ -1,9 +1,9 @@
+import { EventEmitter } from "events";
 import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SFTP from './sftp';
 import BaseSSH2Promise from './BaseSSH2Promise';
-import { ClientChannel } from 'ssh2';
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -62,10 +62,10 @@ function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: 
                 events.forEach((event, idx) => {
                     sshConnection.removeListener(event, cbs[idx]);
                 });
-                return Promise.resolve();
+                Promise.resolve();
             } else {
-                if(sshConnection.config.sock) {
-                    SSHUtils.endSocket(sshConnection.config.sock);
+                if(sshConnection.config.sock){
+                    (sshConnection.config.sock as any).destroy();
                 }
                 return sshConnection.close().then(() => {
                     events.forEach((event, idx) => {
@@ -141,10 +141,9 @@ class SSH2Promise extends BaseSSH2Promise {
 
     /**
      * Get SSH if existing from cache otherwise create new one
-     * @param {*} sshConfig
-     * @param {*} isLast
+     * @param {*} sshConfig 
      */
-    getSSHConnection(sshConfig: any, isLast: boolean): Promise<SSHConnection> {
+    getSSHConnection(sshConfig: any, isLast: boolean) {
         var ret;
         if (this.disableCache) {
             ret = new SSHConnection(sshConfig);
@@ -165,18 +164,18 @@ class SSH2Promise extends BaseSSH2Promise {
 
     /**
      * Connect SSH connection, via single or multiple hopping connection
-     * @param {*} Single/Array of sshConfigs
+     * @param {*} Single/Array of sshConfigs 
      */
-    connect(): Promise<SSHConnection>  {
+    connect() {
         var lastSSH;
         for (var i = 0; i < this.config.length; i++) {
             ((sshConfig, isLast) => {
                 if (!lastSSH) {
                     lastSSH = this.getSSHConnection(sshConfig, isLast);
                 } else {
-                    lastSSH = lastSSH.then((ssh) => {
+                    lastSSH = lastSSH.then((ssh: SSHConnection) => {
                         return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);
-                    }).then((stream: ClientChannel) => {
+                    }).then((stream: any) => {
                         sshConfig.sock = stream;
                         return this.getSSHConnection(sshConfig, isLast);
                     });

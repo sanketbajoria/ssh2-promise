@@ -1,6 +1,5 @@
-import SSHTunnel = require('../dist/index')
-var SSHConstants = require("../dist/index").Constants
-var SFTP = require("../dist/index").SFTP
+import SSHTunnel from '../lib/index'
+import SFTP from "../lib/sftp"
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 /* Promise.prototype["finally"] = function (cb) {
@@ -28,25 +27,32 @@ describe("connect to dummy server", function () {
         });
     });
 
-    it("read stream", function (done) {
+    it("read stream", async function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
-        sshTunnel.sftp().createReadStream("/home/ubuntu/abc").then((stream) => {
+        let sftp: SFTP = sshTunnel.sftp()
+        fs.writeFileSync('./test.txt', "Test module");
+        try{
+            await sftp.fastPut('./test.txt', "/home/sanket/test2.txt");
+            expect(1).toBe(1);
+            let stream = await sftp.createReadStream("/home/sanket/test2.txt")
             expect(stream).toBeDefined();
             var buffer = "";
-            stream.on('data', (data) => {
+            stream.on('data', (data:any) => {
                 buffer += data.toString();
             });
-            stream.on('error', (err) => {
+            stream.on('error', (err:any) => {
                 console.log(err);
             });
             stream.on('close', () => {
                 console.log("done - " + buffer);
                 done();
             })
-        }, (error) => {
+        }catch(error){
             expect('1').toBe('2');
             expect(error).toBeUndefined();
             done();
-        })
+        }finally{
+            fs.unlinkSync('./test.txt')
+        }
     });
 });
