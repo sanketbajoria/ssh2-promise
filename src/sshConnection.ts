@@ -105,12 +105,17 @@ export default class SSHConnection extends EventEmitter {
                 this.sshConnection.exec(cmd, options, (err, stream) => {
                     if (err)
                         return reject(err);
+                        
                     stream.on('close', function () {
                         //console.log(`Closed stream - ${cmd}`);
                     }).on('finish', function () {
                         //console.log(`Closed stream - ${cmd}`);
+                    }).stderr.on('data', function (data) {
+                        reject(data.toString());
                     });
-                    resolve(stream);
+                    setTimeout(() => {
+                        resolve(stream);
+                    }, 500)
                 });
             });
         });

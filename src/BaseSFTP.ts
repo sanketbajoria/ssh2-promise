@@ -67,7 +67,7 @@ export default abstract class BaseSFTP extends EventEmitter {
      *
      * Returns `Promise<Array<any>>`
      */
-    readData(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>> {
+    read(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<Array<any>> {
         return Promise.reject(false);
     }
 
@@ -99,7 +99,7 @@ export default abstract class BaseSFTP extends EventEmitter {
     * 
     * Returns `Promise<void>`
     */
-    writeData(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<void> {
+    write(handle: Buffer, buffer: Buffer, offset: number, length: number, position: number): Promise<void> {
         return Promise.reject(false);
     }
 

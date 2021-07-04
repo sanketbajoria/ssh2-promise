@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import TunnelConfig = require('./tunnelConfig');
+import TunnelConfig from './tunnelConfig';
 
 export default abstract class BaseSSH2Promise extends EventEmitter {
 
