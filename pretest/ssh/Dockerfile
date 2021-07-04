@@ -1,10 +1,13 @@
-FROM alpine:latest
+FROM alpine:3.9
 
 ADD docker-entrypoint.sh /usr/local/bin
 
-RUN apk add --update openssh sudo openssh-server-pam\
+RUN sed -i 's/https\:\/\//http\:\/\//g' /etc/apk/repositories \
+    && apk update \
+    && apk add --update openssh sudo openssh-server-pam socat \
     && sed -ri 's/#UsePAM no/UsePAM yes/g' /etc/ssh/sshd_config \
     && sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -ri 's/^#?AllowTcpForwarding\s+.*/AllowTcpForwarding yes/' /etc/ssh/sshd_config \
     && echo root:root | chpasswd \
     && adduser -D sanket \
     && echo sanket:sanket | chpasswd \

@@ -67,5 +67,13 @@ export default {
             resolve: __resolve,
             reject: __reject
         } as Deferred<any>;
-    }
+    },
+    getRandomPort(){
+        return this.randomNumber(49152, 60999);
+    },
+    randomNumber(min:number, max:number) { 
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    } 
 }

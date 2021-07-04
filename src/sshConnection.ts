@@ -4,22 +4,15 @@ import * as fs from 'fs';
 import SSHConstants from './sshConstants';
 import SSHUtils, { Deferred } from './sshUtils';
 import SSH2Promise from './index';
-import { TunnelConfig } from './TunnelConfig';
+import TunnelConfig from './tunnelConfig';
 import {
-    Client, ClientChannel, ClientErrorExtensions, ConnectConfig, ExecOptions, SFTPWrapper, ShellOptions,
+    Client, ClientChannel, ClientErrorExtensions, ExecOptions, SFTPWrapper, ShellOptions,
 } from 'ssh2';
-import { PathLike } from 'fs';
 import { Server } from "net";
+import SSHConfig from './sshConfig'
 
 const socks = require('@heroku/socksv5');
 
-interface SSHConfig extends ConnectConfig {
-    uniqueId: string;
-    reconnect: boolean;
-    reconnectTries: number;
-    reconnectDelay: number;
-    identity: PathLike;
-}
 
 const defaultOptions: Partial<SSHConfig> = {
     reconnect: true,
@@ -141,6 +134,21 @@ export default class SSHConnection extends EventEmitter {
                     }).stderr.on('data', function (data) {
                         reject(data);
                     });
+                })
+            })
+        })
+    }
+
+    /**
+     * Forward out
+     */
+     forwardOut(srcIP:string, srcPort:number, destIP:string, destPort:number): Promise<ClientChannel> {
+        return this.connect().then(() => {
+            return new Promise((resolve, reject) => {
+                this.sshConnection.forwardOut(srcIP, srcPort, destIP, destPort, (err, stream) => {
+                    if (err)
+                        return reject(err);
+                    resolve(stream)
                 })
             })
         })

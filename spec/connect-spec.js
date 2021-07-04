@@ -79,7 +79,6 @@ describe("connect to dummy server", function () {
 
         function hook_stdout() {
             var old_write = process.stdout.write;
-            var old_
             process.stdout.write = (function (write) {
                 return function (string, encoding, fd) {
                     write.apply(process.stdout, arguments);

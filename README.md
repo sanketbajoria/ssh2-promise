@@ -40,13 +40,19 @@ import SSH2Promise = require('ssh2-promise');
 import SSH2Promise from 'ssh2-promise';
 
 
-//To import SFTP Type definition in typescript
+//To import SFTP, SSHConfig, TunnelConfig Type definition, SSHConstants in typescript
 
 //without esModuleInterop
 import SFTP = require('ssh2-promise/lib/sftp')
+import SSHConfig = require('ssh2-promise/lib/sshConfig');
+import TunnelConfig = require('ssh2-promise/lib/tunnelConfig');
+import SSHConstants = require('ssh2-promise/lib/sshConstants');
 
 //with esModuleInterop
 import SFTP from 'ssh2-promise/lib/sftp'
+import SSHConfig from 'ssh2-promise/lib/sshConfig';
+import TunnelConfig from 'ssh2-promise/lib/tunnelConfig';
+import SSHConstants from 'ssh2-promise/lib/sshConstants';
 ```
 
 #### Connect to SSH Server
@@ -403,6 +409,9 @@ ssh.subsys('sftp').then((stream) => {
   * **reconnectTries** - Number of reconnect tries. **Default:** `'10'`.
 
   * **reconnectDelay** - Delay after which reconnect should be done. **Default:** `'5000'`. 
+
+  * **hoppingTool** - To hop connection using this tool. **Default:** `'nc'`. Supported Tools are `'nc'`, `'socat'`, `'native'`
+  
 
 * **connect**() - _(Promise)_ - Try to establish a connection. No need to explicitly call connect method. It get called automatically, while doing operation.
 

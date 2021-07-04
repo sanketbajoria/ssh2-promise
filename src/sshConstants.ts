@@ -1,4 +1,4 @@
-export default {
+let Constants = {
     "CHANNEL": {
         SSH: "ssh",
         TUNNEL: "tunnel",
@@ -10,5 +10,12 @@ export default {
         BEFOREDISCONNECT: "beforedisconnect",
         DISCONNECT: "disconnect",
         CONTINUE: "continue"
+    },
+    "HOPPINGTOOL": {
+        NETCAT: 'nc',
+        SOCAT: 'socat',
+        NATIVE: 'native'
     }
 }
+
+export = Constants

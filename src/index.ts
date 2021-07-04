@@ -4,6 +4,7 @@ import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
 import SFTP from './sftp';
 import BaseSSH2Promise from './BaseSSH2Promise';
+import SSHConfig from "./sshConfig"
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -99,11 +100,11 @@ class SSH2Promise extends BaseSSH2Promise {
     static Constants = SSHConstants;
 
     rawSFTP: () => Promise<any>;
-    config: any;
+    config: Array<SSHConfig>;
     deregister: Array<any>;
     disableCache: boolean;
 
-    constructor(options: any, disableCache?: boolean) {
+    constructor(options: Array<SSHConfig> | SSHConfig, disableCache?: boolean) {
         super();
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o: any) => {
@@ -169,12 +170,18 @@ class SSH2Promise extends BaseSSH2Promise {
     connect() {
         var lastSSH;
         for (var i = 0; i < this.config.length; i++) {
-            ((sshConfig, isLast) => {
+            ((sshConfig:SSHConfig, isLast:boolean) => {
                 if (!lastSSH) {
                     lastSSH = this.getSSHConnection(sshConfig, isLast);
                 } else {
                     lastSSH = lastSSH.then((ssh: SSHConnection) => {
-                        return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);
+                        if(ssh.config.hoppingTool === SSHConstants.HOPPINGTOOL.SOCAT){
+                            return ssh.spawn(`socat - TCP:${sshConfig.host}:${sshConfig.port}`);
+                        }else if(ssh.config.hoppingTool === SSHConstants.HOPPINGTOOL.NATIVE){
+                            return ssh.forwardOut('127.0.0.1', SSHUtils.getRandomPort(), sshConfig.host, sshConfig.port);
+                        }else {
+                            return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);    
+                        }
                     }).then((stream: any) => {
                         sshConfig.sock = stream;
                         return this.getSSHConnection(sshConfig, isLast);
