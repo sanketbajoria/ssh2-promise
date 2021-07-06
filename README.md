@@ -14,7 +14,7 @@ This module is written in `Typescript`. It can be used in `Javascript` or in `Ty
 //(Require Node v10.16.0 or newer)
 npm install ssh2-promise;
 
-//for older version (Supports Node lower than v10.16.0)
+//for older version (Supports for any version of Node)
 npm install ssh2-promise@0.2.0
 ```
 
