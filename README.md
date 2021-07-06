@@ -4,12 +4,18 @@
 It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too.
 This module is written in `Typescript`. It can be used in `Javascript` or in `Typescript` with full type support.
 
+<p style="color:"><b><i>We have upgraded to ssh2 v1.1.0. It means minimum Node requirement v10.16.0, if you need support for older version please use ssh2-promise v0.2.0</i></b></p>
+
 <p style="color:red"><b><i>Change in sftp api, now ssh.sftp() provide wrapped SFTP session instead of raw sftp session.</i></b></p>
 
 # Installation
 
 ```javascript
+//(Require Node v10.16.0 or newer)
 npm install ssh2-promise;
+
+//for older version (Supports Node lower than v10.16.0)
+npm install ssh2-promise@0.2.0
 ```
 
 # Local Testing
