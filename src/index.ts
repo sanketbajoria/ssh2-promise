@@ -1,10 +1,12 @@
-import { EventEmitter } from "events";
+import {
+    SFTPWrapper
+} from 'ssh2';
+import BaseSSH2Promise from './BaseSSH2Promise';
+import SFTP from './sftp';
+import SSHConfig from "./sshConfig";
 import SSHConnection from './sshConnection';
 import SSHConstants from './sshConstants';
 import SSHUtils from './sshUtils';
-import SFTP from './sftp';
-import BaseSSH2Promise from './BaseSSH2Promise';
-import SSHConfig from "./sshConfig"
 
 function isRegistered(sshConnection: SSHConnection, sshTunnel: SSH2Promise) {
     return sshTunnel.deregister.filter((i) => {
@@ -42,16 +44,6 @@ function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: 
     events.push(disconnectEvent);
     cbs.push(disconnectCb);
     sshConnection.on(disconnectEvent, disconnectCb);
-
-    if (isLast) {
-        var continueEvent = `${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`;
-        var continueCb = () => {
-            sshTunnel.emit.apply(sshTunnel, arguments);
-        };
-        events.push(continueEvent);
-        cbs.push(continueCb);
-        sshConnection.on(continueEvent, continueCb);
-    }
 
     return {
         sshConnection: sshConnection,
@@ -99,7 +91,7 @@ class SSH2Promise extends BaseSSH2Promise {
     static SFTP = SFTP;
     static Constants = SSHConstants;
 
-    rawSFTP: () => Promise<any>;
+    rawSFTP: () => Promise<SFTPWrapper>;
     config: Array<SSHConfig>;
     deregister: Array<any>;
     disableCache: boolean;

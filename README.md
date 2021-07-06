@@ -1,7 +1,7 @@
 # Description
 
 [ssh2-promise](https://github.com/sanketbajoria/ssh2-promise) is a powerful promise wrapper around [ssh2](https://www.npmjs.com/package/ssh2) client. It supports all the ssh2 client operation such as connection hopping, exec, spawn, shell, sftp, open tunnel, open socks connection etc... in promisify and async-await way. It helps in caching the sshconnection, to reduce time, during connection hopping. It have reconnect logic, so that, once disconnected, it can retry the sshconnection, automatically.  
-It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too. It can handle 'continue' event automatically, While doing any sftp operation.
+It has promise wrapper around [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) operations too.
 This module is written in `Typescript`. It can be used in `Javascript` or in `Typescript` with full type support.
 
 <p style="color:red"><b><i>Change in sftp api, now ssh.sftp() provide wrapped SFTP session instead of raw sftp session.</i></b></p>
@@ -445,7 +445,7 @@ ssh.subsys('sftp').then((stream) => {
 * **getSocksPort**([< _number_ >localPort]) - _(Promise)_ - Start a socks server. And, return a socks port, for reverse tunneling purpose.  localPort is optional. By default, it will bind to a random port, if not passed.
 
 ## SFTP
-It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It can handle 'continue' event automatically, While doing any sftp operation. It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readFileData`, `writeFileData`, `changeMode`, `changeOwner`.
+It supports all the [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md) client operations, in promisify way. For detailed explanation of all the operation, please visit [sftp](https://github.com/mscdex/ssh2-streams/blob/master/SFTPStream.md). It has few extra methods `getStat`, `setStat`, `changeTimestamp`, `readFileData`, `writeFileData`, `changeMode`, `changeOwner`.
 
 #### Methods
 * **(constructor)**(< _object_ > ssh2) - Creates and returns a new SFTP instance, which can perform all sftp client operation such readdir, mkdir etc... in promisify way.

@@ -8,8 +8,7 @@ let Constants = {
         BEFORECONNECT: "beforeconnect",
         CONNECT: "connect",
         BEFOREDISCONNECT: "beforedisconnect",
-        DISCONNECT: "disconnect",
-        CONTINUE: "continue"
+        DISCONNECT: "disconnect"
     },
     "HOPPINGTOOL": {
         NETCAT: 'nc',

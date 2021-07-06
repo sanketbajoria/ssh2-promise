@@ -157,7 +157,8 @@ describe("sftp cmd", function () {
         });
     }); 
 
-    /* it("rename file", function (done) {
+    it("rename file", async function (done) {
+        await sshTunnel.exec("rm", ["-rf", "/home/sanket/*"])
         sftp.createWriteStream("/home/sanket/abc").then((stream) => {
             expect(stream).toBeDefined();
             stream.write('dummy\n\n\nasdfjsdaf\n', () => {
@@ -178,7 +179,7 @@ describe("sftp cmd", function () {
             expect(error).toBeUndefined();
             done();
         })
-    });  */
+    });
 
     it("move file to different location", function (done) {
         sftp.changeOwner("/home/sanket/abc", 0, 0).then((handle) => {

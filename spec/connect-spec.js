@@ -139,7 +139,6 @@ describe("connect to dummy server", function () {
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(1);
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(1);
                 expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(1);
-                //expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`)).toBe(1);
             });
         }, (error) => {
             expect(error).toBeUndefined();
@@ -149,7 +148,6 @@ describe("connect to dummy server", function () {
                     expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(0);
                     expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(0);
                     expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(0);
-                    expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`)).toBe(0);
                 });
                 done();
             });
@@ -197,7 +195,6 @@ describe("connect to dummy server", function () {
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(0);
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(0);
                 expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(0);
-                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`)).toBe(0);
             });
             done();
         });
@@ -243,7 +240,6 @@ describe("connect to dummy server", function () {
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.SSH)).toBe(0);
                 expect(SSHTunnel.__cache[k].listenerCount(SSHConstants.CHANNEL.TUNNEL)).toBe(0);
                 expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.DISCONNECT}`)).toBe(0);
-                expect(SSHTunnel.__cache[k].listenerCount(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`)).toBe(0);
             });
             done();
         });

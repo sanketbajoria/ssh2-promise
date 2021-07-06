@@ -1,7 +1,6 @@
-import SSHConstants from './sshConstants';
-import SSH2Promise from './index';
-import BaseSFTP from './BaseSFTP';
 import { ReadStreamOptions, WriteStreamOptions } from 'ssh2-streams';
+import BaseSFTP from './BaseSFTP';
+import SSH2Promise from './index';
 
 var stringFlagMap = ['r', 'r+', 'w', 'wx', 'xw', 'w+', 'wx+', 'xw+', 'a', 'ax', 'xa', 'a+', 'ax+', 'xa+'];
 
@@ -16,39 +15,18 @@ class SFTP extends BaseSFTP {
     constructor(ssh:SSH2Promise) {
         super();
         this.ssh = ssh;
-        var __resolve:Function = null;
-        var $ready = Promise.resolve();
-        this.ssh.on(`${SSHConstants.CHANNEL.SSH}:${SSHConstants.STATUS.CONTINUE}`, () => {
-            if(__resolve){
-                __resolve();
-            }
-        });
         methods.forEach((m:string) => {
             (this as any)[m] = function () {
                 var params = [...arguments];
                 return new Promise((resolve, reject) => {
-                    params.push(function () {
-                        if (arguments[0])
-                            reject(arguments[0]);
-                        var params = [...arguments].slice(1);
-                        params.length==1?resolve(params[0]):resolve(params);
+                    params.push(function (err:Error, ...results:any) {
+                        if (err)
+                            return reject(err);
+                        return (results && results.length==1)?resolve(results[0]):resolve(results);
                     });
-                    var recur = () => {
-                        $ready.then(() => {
-                            return this.ssh.rawSFTP();    
-                        }).then((sftp) => {
-                            var executed = sftp[m].apply(sftp, params);
-                            if (executed === false) {
-                                $ready = new Promise((resolve, reject) => {
-                                    __resolve = resolve;
-                                    recur();
-                                });
-                            }
-                        }, (err) => {
-                            reject(err);
-                        });
-                    }
-                    recur();
+                    this.ssh.rawSFTP().then((sftp:any) => {
+                        sftp[m].apply(sftp, params);
+                    });
                 });
             }.bind(this);
         });
