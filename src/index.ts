@@ -63,7 +63,7 @@ function register(sshConnection: SSHConnection, sshTunnel: SSH2Promise, isLast: 
                 events.forEach((event, idx) => {
                     sshConnection.removeListener(event, cbs[idx]);
                 });
-                Promise.resolve();
+                return Promise.resolve();
             } else {
                 if(sshConnection.config.sock){
                     (sshConnection.config.sock as any).destroy();

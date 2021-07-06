@@ -16,16 +16,21 @@ var util = require('util');
 describe("connect to dummy server via hopping", function () {
     it("should connect to server with hopping with default nc", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.multiple);
+        var sshTunnel1 = new SSHTunnel(sshConfigs.multiple);
         return sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
         }, (error) => {
             expect('1').toBe('2');
             expect(error).toBeUndefined();
         }).finally(() => {
+            return sshTunnel1.connect();
+        }).finally(() => {
             sshTunnel.close();
+            sshTunnel1.close();
             console.log("closed one")
             done();
         });
+        
     });
  
 });   
