@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "ts-node node_modules/jasmine/bin/jasmine spec/test*-spec.*",
+    "test": "ts-node node_modules/jasmine/bin/jasmine spec/*-spec.*",
     "prepare": "npm run build"
   },
   "keywords": [
