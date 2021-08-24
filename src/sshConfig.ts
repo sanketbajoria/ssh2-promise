@@ -1,5 +1,5 @@
 
-import {ConnectConfig} from 'ssh2';
+import {ConnectConfig, X11Details} from 'ssh2';
 import { PathLike } from 'fs';
 interface SSHConfig extends ConnectConfig {
     /** Optional Unique ID attached to ssh connection. */
@@ -14,6 +14,9 @@ interface SSHConfig extends ConnectConfig {
     identity?: PathLike;
     /** To hop multiple connection using this tool. Default nc. Supported Value are nc, socat, native */
     hoppingTool?: string;
+
+    /** x11 details can srcIP or srcPort, or unix socket string */
+    x11?: string | X11Details
     
 }
 export = SSHConfig

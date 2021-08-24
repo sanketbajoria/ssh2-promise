@@ -168,11 +168,11 @@ class SSH2Promise extends BaseSSH2Promise {
                 } else {
                     lastSSH = lastSSH.then((ssh: SSHConnection) => {
                         if(ssh.config.hoppingTool === SSHConstants.HOPPINGTOOL.SOCAT){
-                            return ssh.spawn(`socat - TCP:${sshConfig.host}:${sshConfig.port}`);
+                            return SSHUtils.checkStreamError(ssh.spawn(`socat - TCP:${sshConfig.host}:${sshConfig.port}`));
                         }else if(ssh.config.hoppingTool === SSHConstants.HOPPINGTOOL.NATIVE){
                             return ssh.forwardOut('127.0.0.1', SSHUtils.getRandomPort(), sshConfig.host, sshConfig.port);
                         }else {
-                            return ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`);    
+                            return SSHUtils.checkStreamError(ssh.spawn(`nc ${sshConfig.host} ${sshConfig.port}`));    
                         }
                     }).then((stream: any) => {
                         sshConfig.sock = stream;

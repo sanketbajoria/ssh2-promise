@@ -291,6 +291,8 @@ ssh.addTunnel({remoteAddr: "www.google.com", remotePort: "80"}).then((tunnel) =>
 #### x11
 
 ```javascript
+sshconfig.x11 = {srcIP: 'localhost', srcPort: 6000}
+//sshconfig.x11 = '/tmp/.X11-unix/X0' //connect to unix socket
 var ssh = new SSH2Promise(sshconfig);
 
 //It will establish the x11 forwarding, if
@@ -417,6 +419,8 @@ ssh.subsys('sftp').then((stream) => {
   * **reconnectDelay** - Delay after which reconnect should be done. **Default:** `'5000'`. 
 
   * **hoppingTool** - To hop connection using this tool. **Default:** `'nc'`. Supported Tools are `'nc'`, `'socat'`, `'native'`
+
+  * **x11** - Connect to x11 server in different manner. **Default:** `'localhost:6000'`. Supported Options are {srcIP: 'localhost', srcPort: 6005} or custom unix socket for eg: '/tmp/.X11-unix/X0'
   
 
 * **connect**() - _(Promise)_ - Try to establish a connection. No need to explicitly call connect method. It get called automatically, while doing operation.

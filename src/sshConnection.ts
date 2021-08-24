@@ -110,12 +110,10 @@ export default class SSHConnection extends EventEmitter {
                         //console.log(`Closed stream - ${cmd}`);
                     }).on('finish', function () {
                         //console.log(`Closed stream - ${cmd}`);
-                    }).stderr.on('data', function (data) {
+                    })/* .stderr.on('data', function (data) {
                         reject(data.toString());
-                    });
-                    setTimeout(() => {
-                        resolve(stream);
-                    }, 500)
+                    }); */
+                    resolve(stream)
                 });
             });
         });
@@ -262,7 +260,16 @@ export default class SSHConnection extends EventEmitter {
                     this.emit(SSHConstants.CHANNEL.X11, SSHConstants.STATUS.DISCONNECT, {err: err, msg: "X Server not running locally."})
                 });
                 // connects to localhost:0.0
-                xserversock.connect(6000, 'localhost');
+                if(this.config.x11){
+                    if(typeof this.config.x11 === 'string'){
+                        xserversock.connect(this.config.x11)
+                    }else{
+                        xserversock.connect(this.config.x11.srcPort, this.config.x11.srcIP)
+                    }
+                }else{
+                    xserversock.connect(6000, 'localhost');
+                }
+                
             }).on('error', (err) => {
                 this.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.DISCONNECT, {err: err});
                 this.__err = err;
