@@ -88,6 +88,10 @@ ssh.connect().then(() => {
     console.log("Connection established");
 })();
 
+//Close the ssh connection 
+//very important otherwise event leaks can happen
+ssh.close(); 
+
 
 ```
 #### Connect to SSH Server via hopping
