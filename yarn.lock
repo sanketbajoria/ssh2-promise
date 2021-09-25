@@ -1053,6 +1053,11 @@ is-primitive@^2.0.0:
   resolved "https://registry.npmjs.org/is-primitive/-/is-primitive-2.0.0.tgz"
   integrity sha1-IHurkWOEmcB7Kt8kCkGochADRXU=
 
+is-primitive@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/is-primitive/-/is-primitive-3.0.1.tgz#98c4db1abff185485a657fc2905052b940524d05"
+  integrity sha512-GljRxhWvlCNRfZyORiH77FwdFwGcMO620o37EOYC0ORWdq+WYNVqW0w2Juzew4M+L81l6/QS3t5gkkihyRqv9w==
+
 is-relative@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/is-relative/-/is-relative-1.0.0.tgz"
@@ -1660,15 +1665,13 @@ sequencify@~0.0.7:
   resolved "https://registry.npmjs.org/sequencify/-/sequencify-0.0.7.tgz"
   integrity sha1-kM/xnQLgcCf9dn9erT57ldHnOAw=
 
-set-value@^2.0.0, set-value@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.npmjs.org/set-value/-/set-value-2.0.1.tgz"
-  integrity sha512-JxHc1weCN68wRY0fhCoXpyK55m/XPHafOmK4UWD7m2CI14GMcFypt4w/0+NV5f/ZMby2F6S2wwA7fgynh9gWSw==
+set-value@^2.0.0, set-value@^2.0.1, set-value@^4.0.1:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/set-value/-/set-value-4.1.0.tgz#aa433662d87081b75ad88a4743bd450f044e7d09"
+  integrity sha512-zTEg4HL0RwVrqcWs3ztF+x1vkxfm0lP+MQQFPiMJTKVceBwEV0A569Ou8l9IYQG8jOZdMVI1hGsc0tmeD2o/Lw==
   dependencies:
-    extend-shallow "^2.0.1"
-    is-extendable "^0.1.1"
-    is-plain-object "^2.0.3"
-    split-string "^3.0.1"
+    is-plain-object "^2.0.4"
+    is-primitive "^3.0.1"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
@@ -1739,7 +1742,7 @@ sparkles@^1.0.0:
   resolved "https://registry.npmjs.org/sparkles/-/sparkles-1.0.1.tgz"
   integrity sha512-dSO0DDYUahUt/0/pD/Is3VIm5TGJjludZ0HVymmhYF6eNA53PVLhnUk0znSYbH8IYBuJdCE+1luR22jNLMaQdw==
 
-split-string@^3.0.1, split-string@^3.0.2:
+split-string@^3.0.2:
   version "3.1.0"
   resolved "https://registry.npmjs.org/split-string/-/split-string-3.1.0.tgz"
   integrity sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==
@@ -1751,10 +1754,10 @@ sprintf-js@1.1.2:
   resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.1.2.tgz"
   integrity sha512-VE0SOVEHCk7Qc8ulkWw3ntAzXuqf7S2lvwQaDLRnUeIEaKNQJzV6BwmLKhOqT61aGhfUMrXeaBk+oDGCzvhcug==
 
-ssh2@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-1.3.0.tgz#bcd42ef7796250268b6ff6b0bbff2697029e91b9"
-  integrity sha512-OjBQ5FR+ClYav3fRnvkhycmd5co5qEfofBaZEqVO3I4tKJLZqu+Ku4LN4nJSckjhqQnomqBqlCdvD3iGV+6isA==
+ssh2@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-1.4.0.tgz#e32e8343394364c922bad915a5a7fecd67d0f5c5"
+  integrity sha512-XvXwcXKvS452DyQvCa6Ct+chpucwc/UyxgliYz+rWXJ3jDHdtBb9xgmxJdMmnIn5bpgGAEV3KaEsH98ZGPHqwg==
   dependencies:
     asn1 "^0.2.4"
     bcrypt-pbkdf "^1.0.2"
