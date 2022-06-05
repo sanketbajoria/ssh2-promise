@@ -11,7 +11,7 @@ var enhanceMethods: any = {"readFileData": "read", "writeFileData": "write", "ge
 class SFTP extends BaseSFTP {
 
     ssh:SSH2Promise;
-    
+
     constructor(ssh:SSH2Promise) {
         super();
         this.ssh = ssh;
@@ -26,7 +26,7 @@ class SFTP extends BaseSFTP {
                     });
                     this.ssh.rawSFTP().then((sftp:any) => {
                         sftp[m].apply(sftp, params);
-                    });
+                    }).catch((err:any) => reject(err));
                 });
             }.bind(this);
         });
