@@ -7,3 +7,4 @@ test-spec.js
 lib
 dist
 test
+package-lock.json
