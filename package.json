@@ -43,7 +43,7 @@
   "license": "MIT",
   "dependencies": {
     "@heroku/socksv5": "^0.0.9",
-    "ssh2": "^1.4.0"
+    "ssh2": "^1.10.0"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.9",
@@ -63,7 +63,7 @@
     "lodash": "^4.17.21",
     "lodash.template": "^4.5.0",
     "lodash.merge": "^4.6.2",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "kind-of": "^6.0.3",
     "minimatch": "^3.0.4",
     "glob-parent": "^5.1.2",
