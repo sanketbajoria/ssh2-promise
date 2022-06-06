@@ -98,6 +98,17 @@ describe("exec n spawn cmd", function () {
         });
     });
 
+    it("exec a command with error", function (done) {
+        sshTunnel.exec("mkdir abc && mkdir abc").then(() => {
+            expect('1').toBe('2');
+        }, (error) => {
+            expect(error).toBeDefined();
+            expect(error).toBe("mkdir: can't create directory 'abc': File exists\n")
+        }).finally(() => {
+            done();
+        });
+    });
+
     afterAll(() => {
         sshTunnel.close()
     })
