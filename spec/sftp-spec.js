@@ -7,65 +7,56 @@ Promise.prototype.finally = function (cb) {
     return this.then(fin, fin);
 };
 var fs = require("fs");
-var sshConfigs = require('./fixture') //var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+var sshConfigs = require('./fixture'); //var sshConfigs = JSON.parse(fs.readFileSync("./spec/fixture.json"));
+const { Z_STREAM_END } = require("zlib");
 
 
 describe("sftp cmd", function () {
     var sshTunnel;
+    let path = "/home/sanket/sftp"
     beforeAll(() => {
         sshTunnel = new SSHTunnel(sshConfigs.singleWithKey);
         sftp = sshTunnel.sftp();//new SSHTunnel.SFTP(sshTunnel);//sshTunnel.sftp()
     });
 
+    beforeEach(async () => {
+        await sshTunnel.exec("rm", ["-rf", path])
+        await sshTunnel.exec("mkdir", [path])
+    })
 
-    it("read/write file", function (done) {
-        (async function(){
-            try{
-                await sftp.mkdir('/home/sanket/dummy')
-                await sftp.rmdir('/home/sanket/dummy');
-                expect(1).toBe(1);
-            }catch(err){
-                expect(1).toBe(0);
-            }finally{
-                done();
-            }
-        })();
+
+
+    it("create/delete folder", async () => {
+        await sftp.mkdir(`${path}/test1`)
+        expect(await sshTunnel.exec("ls", [path])).toContain("test1");
+        await sftp.rmdir(`${path}/test1`);
+        expect(await sshTunnel.exec("ls", [path])).not.toContain("test1");
+        expect(1).toBe(1);
     });
 
-   it("read/write file", function (done) {
-        (async function(){
-            try{
-                await sshTunnel.exec("rm", ["-rf", "/home/sanket/dummy"])
-                await sftp.writeFile('/home/sanket/dummy', "testing123");
-                var content = await sftp.readFile('/home/sanket/dummy', "utf8");
-                expect(content).toBe("testing123");
-            }catch(err){
-                expect(1).toBe(0);
-            }finally{
-                sshTunnel.exec("rm", ["-rf", "/home/sanket/dummy"])
-                done();
-            }
-        })();
-    }); 
+    it("read/write file ", async () => {
+        await sftp.writeFile(`${path}/dummy`, "testing123");
+        var content = await sftp.readFile(`${path}/dummy`, "utf8");
+        expect(content).toBe("testing123");
+    });
 
-    it("fast put file", function (done) {
-        (async function(){
-            try{
-                fs.writeFileSync('./test.txt', "Test module");
-                await sftp.fastPut('./test.txt', "/home/sanket/test2.txt");
-                expect(1).toBe(1);
-                await sftp.fastGet("/home/sanket/test2.txt", './test2.txt');
-                fs.unlinkSync("./test2.txt");
-                var content = await sftp.readFile('/home/sanket/test2.txt', "utf8");
-                expect(content).toBe("Test module");
-            }catch(err){
-                console.log(err);
-                expect(1).toBe(0);
-            }finally{
-                fs.unlinkSync('./test.txt')
-                done();
-            }
-        })();
+    it("fast get/put file", async () => {
+        try {
+            //mock data
+            fs.writeFileSync('./test.txt', "Test module");
+
+            //fast put
+            await sftp.fastPut('./test.txt', `${path}/test2.txt`);
+            let content = await sftp.readFile(`${path}/test2.txt`, "utf8");
+            expect(content).toBe("Test module");
+
+            //fast get
+            await sftp.fastGet(`${path}/test2.txt`, './test2.txt');
+            expect(fs.readFileSync("./test2.txt").toString()).toBe("Test module")
+        } finally {
+            fs.unlinkSync('./test.txt')
+            fs.unlinkSync("./test2.txt");
+        }
     });
 
     it("read dir", function (done) {
@@ -80,120 +71,102 @@ describe("sftp cmd", function () {
     });
 
     it("write stream", function (done) {
-        sftp.createWriteStream("/home/sanket/abc").then((stream) => {
+        sftp.createWriteStream(`${path}/abc`).then((stream) => {
             expect(stream).toBeDefined();
-            stream.write('dummy\n\n\nasdfjsdaf\n', () => {
-                stream.end(() => {
-                    done();
-                });
-            });
-        }, (error) => {
-            expect('1').toBe('2');
-            expect(error).toBeUndefined();
-            done();
-        })
-    });
-
-    it("read stream", function (done) {
-        sftp.createReadStream("/home/sanket/abc").then((stream) => {
-            expect(stream).toBeDefined();
-            var buffer = "";
-            stream.on('data', (data) => {
-                buffer += data.toString();
-            });
-            stream.on('error', (err) => {
-                console.log(err);
-            });
-            stream.on('close', () => {
-                console.log(buffer);
+            stream.write("dummy");
+            stream.end("test");
+            stream.on("finish", async () => {
+                expect(await sshTunnel.exec("cat", [`${path}/abc`])).toContain("dummytest");
+                done();
+            })
+            stream.on("error", (data) => {
+                expect('1').toBe('2');
+                expect(error).toBeUndefined();
                 done();
             })
         }, (error) => {
             expect('1').toBe('2');
             expect(error).toBeUndefined();
+            console.log(error);
             done();
         })
     });
 
-    it("get stats", function (done) {
-        sftp.getStat("/home/sanket/abc", "r").then((stat) => {
-            expect(stat).toBeDefined();
+    it("read stream", async (done) => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/def`])
+
+        //Test readstream
+        let stream = await sftp.createReadStream(`${path}/def`)
+        expect(stream).toBeDefined();
+        var buffer = "";
+        stream.on('data', (data) => {
+            buffer += data.toString();
+        });
+        stream.on('error', (err) => {
+            console.log(err);
             done();
-        }, (error) => {
-            expect('1').toBe('2');
-            expect(error).toBeUndefined();
+        });
+        stream.on('close', () => {
+            expect(buffer).toContain("dummytest")
             done();
         })
     });
 
-    it("set stats", function (done) {
-        sftp.setStat("/home/sanket/abc", { mode: 0755 }).then(() => {
-            expect(1).toBe(1);
-        }, (err) => {
-            expect(err).toBeUndefined();
-        }).finally(() => {
-            done();
-        });
+    it("get stats", async () => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/xyz`])
+
+        //Test stat
+        let stat = await sftp.getStat(`${path}/xyz`, "r")
+        expect(stat).toBeDefined();
     });
 
-    it("update time & access time", function (done) {
-        sftp.changeTimestamp("/home/sanket/abc", new Date().getTime(), new Date().getTime()).then(() => {
-            expect(1).toBe(1);
-        }, (err) => {
-            expect(err).toBeUndefined();
-        }).finally(() => {
-            done();
-        });
+    it("set stats", async () => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/stat1`])
+
+        //Test set stats
+        await sftp.setStat(`${path}/stat1`, { mode: 0755 })
+        expect(1).toBe(1);
+
     });
 
-    it("unable to chown to root", function (done) {
-        sftp.changeOwner("/home/sanket/abc", 0, 0).then((handle) => {
-            expect('1').toBe('2');
-        }, (err) => {
-            expect(1).toBe(1);
-            expect(err).toBeDefined();
-        }).finally(() => {
-            done();
-        });
-    }); 
+    it("update time & access time", async () => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/testTime`])
 
-    it("rename file", async function (done) {
-        await sshTunnel.exec("rm", ["-rf", "/home/sanket/*"])
-        sftp.createWriteStream("/home/sanket/abc").then((stream) => {
-            expect(stream).toBeDefined();
-            stream.write('dummy\n\n\nasdfjsdaf\n', () => {
-                stream.end(() => {
-                    expect('1').toBe('1');
-                    sftp.rename("/home/sanket/abc", "/home/sanket/newabc").then(() => {
-                        expect('1').toBe('1')
-                    }).catch((err) => {
-                        console.log(err.message);
-                        expect('1').toBe('2')
-                    }).finally(() => {
-                        done();
-                    })
-                });
-            });
-        }, (error) => {
-            expect('1').toBe('2');
-            expect(error).toBeUndefined();
-            done();
-        })
+        await sftp.changeTimestamp(`${path}/testTime`, new Date().getTime(), new Date().getTime())
+        expect(1).toBe(1);
     });
 
-    it("move file to different location", function (done) {
-        sftp.changeOwner("/home/sanket/abc", 0, 0).then((handle) => {
-            expect('1').toBe('2');
-        }, (err) => {
+    it("unable to chown to root", async () => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/testOwner`])
+
+        //try to change ownership to root
+        try {
+            await sftp.changeOwner(`${path}/testOwner`, 0, 0);
+            expect(1).toBe(2);
+        } catch (err) {
             expect(1).toBe(1);
-            expect(err).toBeDefined();
-        }).finally(() => {
-            done();
-        });
+            expect(err.message).toContain("Permission denied")
+        }
     });
-   
+
+    it("rename/move file", async () => {
+        //mock data
+        await sshTunnel.exec("echo", ['dummytest', '>', `${path}/renfile`])
+        expect(await sshTunnel.exec("ls", [path])).toContain("renfile")
+
+        //Test rename/move file
+        sftp.rename(`${path}/renfile`, `${path}/updatefile`)
+        expect(await sshTunnel.exec("ls", [path])).not.toContain("renfile")
+        expect(await sshTunnel.exec("ls", [path])).toContain("updatefile")
+    });
+
     afterAll(() => {
         sshTunnel.close()
     })
 
-});   
+});

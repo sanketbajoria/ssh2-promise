@@ -88,7 +88,7 @@ describe("exec n spawn cmd", function () {
         });
     });
     
-    it("subsys should be established", function (done) {
+    it("subsys should throw error", function (done) {
         sshTunnel.subsys('dummy').then((stream) => {
             expect('1').toBe('2');
         }, (err) => {
