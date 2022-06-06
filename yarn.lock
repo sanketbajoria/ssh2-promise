@@ -39,17 +39,24 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-16.7.1.tgz"
   integrity sha512-ncRdc45SoYJ2H4eWU9ReDfp3vtFqDYhjOsKlFFUDEn8V1Bgr2RjYal8YT5byfadWIRluhPFU6JiDOl0H6Sl87A==
 
-"@types/ssh2-streams@*", "@types/ssh2-streams@0.1.8":
+"@types/ssh2-streams@*":
   version "0.1.8"
   resolved "https://registry.npmjs.org/@types/ssh2-streams/-/ssh2-streams-0.1.8.tgz"
   integrity sha512-I7gixRPUvVIyJuCEvnmhr3KvA2dC0639kKswqD4H5b4/FOcnPtNU+qWLiXdKIqqX9twUvi5j0U1mwKE5CUsrfA==
   dependencies:
     "@types/node" "*"
 
-"@types/ssh2@0.5.46":
-  version "0.5.46"
-  resolved "https://registry.npmjs.org/@types/ssh2/-/ssh2-0.5.46.tgz"
-  integrity sha512-1pC8FHrMPYdkLoUOwTYYifnSEPzAFZRsp3JFC/vokQ+dRrVI+hDBwz0SNmQ3pL6h39OSZlPs0uCG7wKJkftnaA==
+"@types/ssh2-streams@0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@types/ssh2-streams/-/ssh2-streams-0.1.9.tgz#8ca51b26f08750a780f82ee75ff18d7160c07a87"
+  integrity sha512-I2J9jKqfmvXLR5GomDiCoHrEJ58hAOmFrekfFqmCFd+A6gaEStvWnPykoWUwld1PNg4G5ag1LwdA+Lz1doRJqg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ssh2@0.5.52":
+  version "0.5.52"
+  resolved "https://registry.yarnpkg.com/@types/ssh2/-/ssh2-0.5.52.tgz#9dbd8084e2a976e551d5e5e70b978ed8b5965741"
+  integrity sha512-lbLLlXxdCZOSJMCInKH2+9V/77ET2J6NPQHpFI0kda61Dd1KglJs+fPQBchizmzYSOJBgdTajhPqBO1xxLywvg==
   dependencies:
     "@types/node" "*"
     "@types/ssh2-streams" "*"

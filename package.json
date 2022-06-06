@@ -48,8 +48,8 @@
   "devDependencies": {
     "@types/jasmine": "^2.8.9",
     "@types/node": "^16.7.1",
-    "@types/ssh2": "0.5.46",
-    "@types/ssh2-streams": "0.1.8",
+    "@types/ssh2": "0.5.52",
+    "@types/ssh2-streams": "0.1.9",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.2.3",
     "jasmine": "^2.8.0",
