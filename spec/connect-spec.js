@@ -130,7 +130,7 @@ describe("connect to dummy server", function () {
         })
     });
 
-    it("should check the cache and listeners attached to server, after connect and after disconnect", function (done) {
+    it("should check the cache and listeners attached to server, after connect, after disconnect 1", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.multiple);
         sshTunnel.connect().then((ssh) => {
             expect(ssh).toBeDefined();
@@ -156,7 +156,7 @@ describe("connect to dummy server", function () {
     });
 
 
-    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
+    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect 2", function (done) {
         var sshTunnel = new SSHTunnel(sshConfigs.multiple);
         var sshTunnel2 = new SSHTunnel(sshConfigs.multiple)
         sshTunnel.connect().then((ssh) => {
@@ -200,7 +200,7 @@ describe("connect to dummy server", function () {
         });
     }); 
 
-    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
+    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect 3", function (done) {
 
         var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
         var sshTunnel2 = new SSHTunnel(sshConfigs.couchmultiple)
@@ -245,7 +245,7 @@ describe("connect to dummy server", function () {
         });
     }); 
 
-    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect", function (done) {
+    it("should check the cache and listeners attached to server, with multiple tunnels, after connect and after disconnect 4", function (done) {
 
         var sshTunnel = new SSHTunnel(sshConfigs.couchmultiple);
         sshTunnel.on("ssh:beforeconnect", (sshConnection, payload) => {
@@ -258,4 +258,29 @@ describe("connect to dummy server", function () {
             done();
         })
     }); 
+
+    it("should connect to server with hopping with nc", async () => {
+        let m = sshConfigs.multiple.slice()
+        m[0] = Object.assign({hoppingTool:SSHConstants.HOPPINGTOOL.NETCAT}, m[0])
+        m[0].debugEvent = function(msg){
+            console.log(msg);
+        }
+        m[1].debugEvent = function(msg){
+            console.log(msg);
+        } 
+        var sshTunnel = new SSHTunnel(m);
+        //let firstSSHConn = new SSHTunnel(m[0])
+        let ssh = await sshTunnel.connect()
+        expect(ssh).toBeDefined();
+        //expect(await firstSSHConn.exec("ps", ["aux", "|", "grep nc"])).toContain("nc ssh-with-key")
+        const data = await ssh.exec('whoami');
+        console.log(data.trim());
+        //expect(await firstSSHConn.exec("ps", ["aux", "|", "grep nc"])).toContain("nc ssh-with-key")
+        await sshTunnel.close();
+        //console.log(await firstSSHConn.exec("ps", ["aux", "|", "grep nc"]))
+        //expect(await firstSSHConn.exec("ps", ["aux", "|", "grep nc"])).not.toContain("nc ssh-with-key")
+        //await firstSSHConn.close();
+        //expect(await firstSSHConn.exec("ps", ["aux", "|", "grep nc"])).not.toContain("nc ssh-with-key")
+        console.log("closed one")
+    });
 });   

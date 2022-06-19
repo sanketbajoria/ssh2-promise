@@ -95,8 +95,9 @@ class SSH2Promise extends BaseSSH2Promise {
     config: Array<SSHConfig>;
     deregister: Array<any>;
     disableCache: boolean;
+    detailEvent: boolean;
 
-    constructor(options: Array<SSHConfig> | SSHConfig, disableCache?: boolean) {
+    constructor(options: Array<SSHConfig> | SSHConfig, disableCache?: boolean, detailEvent?: boolean) {
         super();
         options = Array.isArray(options) ? options : [options];
         this.config = options.map((o: any) => {
@@ -106,6 +107,7 @@ class SSH2Promise extends BaseSSH2Promise {
         });
         this.deregister = [];
         this.disableCache = disableCache || false;
+        this.detailEvent = detailEvent || false;
         methods.forEach((m: any) => {
             var k = typeof m == "string"?m:Object.keys(m)[0];
             (this as any)[k] = function () {
@@ -129,6 +131,9 @@ class SSH2Promise extends BaseSSH2Promise {
         if (config.debug) {
             config.debug(arguments);
         }
+        if(config.debugEvent){
+            config.debugEvent(Array.prototype.slice.call(arguments));
+        }
         return super.emit.apply(this, arguments);
     }
 
@@ -138,10 +143,16 @@ class SSH2Promise extends BaseSSH2Promise {
      */
     getSSHConnection(sshConfig: any, isLast: boolean) {
         var ret;
+        sshConfig = sshConfig || {};
         if (this.disableCache) {
+            //close if any existing
+            if(SSH2Promise.__cache[sshConfig.uniqueId]){
+                SSH2Promise.__cache[sshConfig.uniqueId].close();
+                delete SSH2Promise.__cache[sshConfig.uniqueId];
+            }
             ret = new SSHConnection(sshConfig);
         } else {
-            if (sshConfig && !SSH2Promise.__cache[sshConfig.uniqueId]) {
+            if (!SSH2Promise.__cache[sshConfig.uniqueId]) {
                 ret = SSH2Promise.__cache[sshConfig.uniqueId] = new SSHConnection(sshConfig);
             }
             ret = SSH2Promise.__cache[sshConfig.uniqueId];
@@ -150,7 +161,7 @@ class SSH2Promise extends BaseSSH2Promise {
             this.deregister.push(register(ret, this, isLast));
         }
         return ret.connect().then((ssh: SSHConnection) => {
-            ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
+            //ssh.emit(SSHConstants.CHANNEL.SSH, SSHConstants.STATUS.CONNECT);
             return ssh;
         });
     }

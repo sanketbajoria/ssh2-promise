@@ -76,8 +76,8 @@ export default {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
-    async checkStreamError(stream: any, timeout?: number) {
-        stream = await stream;
+    async checkStreamError($stream: any, timeout?: number) {
+        let stream = await $stream;
         return new Promise((resolve, reject) => {
             stream.stderr.on('data', function (data: any) {
                 reject(data.toString());
