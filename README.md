@@ -398,17 +398,81 @@ ssh.subsys('sftp').then((stream) => {
 
   * **strictVendor** - _(Promise)_ - Performs a strict server vendor check before sending vendor-specific requests, etc. (e.g. check for OpenSSH server when using `openssh_noMoreSessions()`) **Default:** `true`
 
-  * **algorithms** - _object_ - This option allows you to explicitly override the default transport layer algorithms used for the connection. Each value must be an array of valid algorithms for that category. The order of the algorithms in the arrays are important, with the most favorable being first. For a list of valid and default algorithm names, please review the documentation for the version of `ssh2-streams` used by this module. Valid keys:
+   * **algorithms** - _object_ - This option allows you to explicitly override the default transport layer algorithms used for the connection. The value for each category must either be an array of valid algorithm names to set an exact list (with the most preferable first) or an object containing `append`, `prepend`, and/or `remove` properties that each contain an _array_ of algorithm names or RegExps to match to adjust default lists for each category. Valid keys:
 
-      * **kex** - _array_ - Key exchange algorithms.
+        * **cipher** - _mixed_ - Ciphers.
+            * Default list (in order from most to least preferable):
+              * `chacha20-poly1305@openssh.com` (priority of chacha20-poly1305 may vary depending upon CPU and/or optional binding availability)
+              * `aes128-gcm`
+              * `aes128-gcm@openssh.com`
+              * `aes256-gcm`
+              * `aes256-gcm@openssh.com`
+              * `aes128-ctr`
+              * `aes192-ctr`
+              * `aes256-ctr`
+            * Other supported names:
+              * `3des-cbc`
+              * `aes256-cbc`
+              * `aes192-cbc`
+              * `aes128-cbc`
+              * `arcfour256`
+              * `arcfour128`
+              * `arcfour`
+              * `blowfish-cbc`
+              * `cast128-cbc`
 
-      * **cipher** - _array_ - Ciphers.
+        * **compress** - _mixed_ - Compression algorithms.
+            * Default list (in order from most to least preferable):
+              * `none`
+              * `zlib@openssh.com`
+              * `zlib`
+            * Other supported names:
 
-      * **serverHostKey** - _array_ - Server host key formats.
+        * **hmac** - _mixed_ - (H)MAC algorithms.
+            * Default list (in order from most to least preferable):
+              * `hmac-sha2-256-etm@openssh.com`
+              * `hmac-sha2-512-etm@openssh.com`
+              * `hmac-sha1-etm@openssh.com`
+              * `hmac-sha2-256`
+              * `hmac-sha2-512`
+              * `hmac-sha1`
+            * Other supported names:
+              * `hmac-md5`
+              * `hmac-sha2-256-96`
+              * `hmac-sha2-512-96`
+              * `hmac-ripemd160`
+              * `hmac-sha1-96`
+              * `hmac-md5-96`
 
-      * **hmac** - _array_ - (H)MAC algorithms.
+        * **kex** - _mixed_ - Key exchange algorithms.
+            * Default list (in order from most to least preferable):
+              * `curve25519-sha256` (node v14.0.0+)
+              * `curve25519-sha256@libssh.org` (node v14.0.0+)
+              * `ecdh-sha2-nistp256`
+              * `ecdh-sha2-nistp384`
+              * `ecdh-sha2-nistp521`
+              * `diffie-hellman-group-exchange-sha256`
+              * `diffie-hellman-group14-sha256`
+              * `diffie-hellman-group15-sha512`
+              * `diffie-hellman-group16-sha512`
+              * `diffie-hellman-group17-sha512`
+              * `diffie-hellman-group18-sha512`
+            * Other supported names:
+              * `diffie-hellman-group-exchange-sha1`
+              * `diffie-hellman-group14-sha1`
+              * `diffie-hellman-group1-sha1`
 
-      * **compress** - _array_ - Compression algorithms.
+        * **serverHostKey** - _mixed_ - Server host key formats.
+            * Default list (in order from most to least preferable):
+              * `ssh-ed25519` (node v12.0.0+)
+              * `ecdsa-sha2-nistp256`
+              * `ecdsa-sha2-nistp384`
+              * `ecdsa-sha2-nistp521`
+              * `rsa-sha2-512`
+              * `rsa-sha2-256`
+              * `ssh-rsa`
+            * Other supported names:
+              * `ssh-dss`
 
   * **compress** - _mixed_ - Set to `true` to enable compression if server supports it, `'force'` to force compression (disconnecting if server does not support it), or `false` to explicitly opt out of compression all of the time. Note: this setting is overridden when explicitly setting a compression algorithm in the `algorithms` configuration option. **Default:** (only use compression if that is only what the server supports)
 
